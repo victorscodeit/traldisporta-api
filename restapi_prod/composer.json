@@ -1,0 +1,18 @@
+{
+    "name": "traldisporta/restapi_prod",
+    "description": "api produccion",
+    "autoload": {
+        "psr-4": {
+            "Traldisporta\\RestapiProd\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "OMS"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "1.29",
+        "phpmailer/phpmailer": "6.9"
+    }
+}
