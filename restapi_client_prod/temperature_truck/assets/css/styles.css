@@ -1,0 +1,91 @@
+/* Estilos generales */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: flex-start;
+}
+
+.header {
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;  
+}
+
+.logo {
+  text-align: left;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-grow: 1;
+  padding-top: 20px;
+}
+
+/* Estilos para la tabla del formulario */
+.form-table {
+  width: 100%;
+  margin: 0 auto;
+  border-collapse: collapse; /* Para eliminar el espacio entre las celdas */
+}
+
+.form-table td {
+  padding: 5px;
+  border: none; /* Quita el borde de las celdas */
+  text-align: center; /* Centra el contenido de las celdas */
+}
+
+.form-table label {
+  display: block; /* Para que los labels ocupen toda la celda */
+  margin-bottom: 5px;
+  font-weight: bold; /* Hace los labels en negrita */
+}
+
+.form-table input[type="text"],
+.form-table input[type="datetime-local"],
+.form-table button {
+  width: calc(100% - 10px); /* Para ajustar el tamaño de los inputs */
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.form-table button {
+  width: 100%; /* Ancho completo para el botón */
+}
+
+.footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  padding: 0;  
+}
+
+
+/* Estilos para la animación de carga */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+}
+
+.loading-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 24px;
+}

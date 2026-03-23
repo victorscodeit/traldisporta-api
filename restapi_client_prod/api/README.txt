@@ -1,0 +1,1 @@
+REST API públic de la plataforma de Traldis Porta.
