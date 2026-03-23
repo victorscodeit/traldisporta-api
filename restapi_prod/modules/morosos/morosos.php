@@ -515,7 +515,7 @@ function sendReportMorosospdf(){
 	"admin1@porta.ad",
 	"admin@traldisporta.com",
 	"jordi.olle@porta.ad",
-	"support@openmindsystems.com.es"
+	"victor@openmindsystems.com.es"
 	);
 	$emailList = array(
 		"victor.sancho.coma@gmail.com"
@@ -867,11 +867,11 @@ function sendReportMorosos(){
 	"comptabilitat@traldisporta.com",
 	"admin@traldisporta.com",
 	"jordi.olle@porta.ad",
-	"support@openmindsystems.com.es",
+	"victor@openmindsystems.com.es",
 	"ruben@porta.ad"
 	);
 
-    $emailDefault = 'support@openmindsystems.com.es';
+    $emailDefault = 'victor@openmindsystems.com.es';
 
     $listBySalesmanEmpty = array();
     $listBySalesman = array();
@@ -1125,7 +1125,7 @@ function sendReportMorosos_csv(){
 	"admin1@porta.ad",
 	"admin@traldisporta.com",
 	"jordi.olle@porta.ad",
-	"support@openmindsystems.com.es"
+	"victor@openmindsystems.com.es"
 	);
 	$emailList = array(
 		"victor.sancho.coma@gmail.com"

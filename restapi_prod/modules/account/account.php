@@ -325,6 +325,25 @@ c.ConCepDes as concepto
   LEFT JOIN CONCEPTO as c on c.ConCepCod=IMPORTES.ConCepCod
   where ImporTip='V' AND ImpFraNum=".$ImpFraNum." and ImpFraCtr=".$ImpFraCtr." and ImpFraSer=".$ImpFraSer."  GROUP by BasCod, ImpDes, ImporTip,ImpFraCtr, c.ConCepDes, c.ConCepBas";
 
+/*NUEVA 2026
+	$sql0 = "SELECT 
+ImpFraCtr,
+ImporTip,
+ImpDes,
+SUM(CASE 
+            WHEN ImpReal > 0 AND ImpNeto<=0 THEN ImpReal 
+            ELSE ImpNeto 
+        END) AS ImpNeto,
+    CASE 
+        WHEN c.ConCepBas = 'N' THEN 'S'
+        ELSE 'N'
+    END AS ImpBas,
+BasCod as TIva,
+c.ConCepDes as concepto
+  FROM [trans].[dbo].[IMPORTES]
+  LEFT JOIN CONCEPTO as c on c.ConCepCod=IMPORTES.ConCepCod
+  where ImporTip='V' AND ImpFraNum=".$ImpFraNum." and ImpFraCtr=".$ImpFraCtr." and ImpFraSer=".$ImpFraSer."  GROUP by BasCod, ImpDes, ImporTip,ImpFraCtr, c.ConCepDes, c.ConCepBas";*/
+
         //print($sql0);
 
         $stm0 = $this->conn->query($sql0, PDO::FETCH_ASSOC);

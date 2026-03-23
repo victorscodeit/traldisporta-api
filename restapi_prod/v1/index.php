@@ -365,6 +365,89 @@ $app->post('/getTemperatureReportTest', 'authenticate', function () use ($app) {
 	echoResponse(HTTP_OK, $datos_finales);
 });
 
+$app->post('/getGPSExpeditionExternal', 'authenticate', function () use ($app) {
+    //Camps necessitaris per aquesta petició
+    $requiredParams = array(
+        "expeditionCode",
+		"centerCode"
+    );
+    //Comprovem que aquests camps estiguin en el body de la petició
+    verifyRequiredParams($requiredParams);
+	
+	//Recuperem els paràmetres del body
+    $params = json_decode($app->request->getBody(), true);
+	$m = new Movertis();
+	$respuesta=$m->getExpeditionFromOrder($params['expeditionCode']);
+	$expeditionCode=$respuesta[0]['codigoExpedicion'];
+	$centerCode=$respuesta[0]['codigoCentro'];
+	//Obtenemos el report de temperaturas
+	$datos_finales=array();
+    $datos_finales=getTemperatureReport($expeditionCode, $centerCode);
+	
+	// Filtrar solo los datos con coordenadas GPS válidas
+	$datos_filtrados = filterGPSData($datos_finales);
+	
+	echoResponse(HTTP_OK, $datos_filtrados);
+});
+
+$app->post('/getGPSExpeditionInternal', 'authenticate', function () use ($app) {
+    //Camps necessitaris per aquesta petició
+    $requiredParams = array(
+        "expeditionCode",
+		"centerCode"
+    );
+    //Comprovem que aquests camps estiguin en el body de la petició
+    verifyRequiredParams($requiredParams);
+	
+	//Recuperem els paràmetres del body
+    $params = json_decode($app->request->getBody(), true);
+	$m = new Movertis();
+	
+	//Obtenemos el report de temperaturas
+	$datos_finales=array();
+    $datos_finales=getTemperatureReport($params['expeditionCode'], $params['centerCode']);
+	
+	// Filtrar solo los datos con coordenadas GPS válidas
+	$datos_filtrados = filterGPSData($datos_finales);
+	
+	echoResponse(HTTP_OK, $datos_filtrados);
+});
+
+function filterGPSData($datos) {
+	$datos_filtrados = array();
+	
+	// Recorrer cada fase (clave del array)
+	foreach ($datos as $fase => $datos_fase) {
+		// Verificar que sea un array
+		if (is_array($datos_fase)) {
+			// Recorrer cada registro de la fase
+			foreach ($datos_fase as $registro) {
+				// Verificar que ubicacion_y y ubicacion_x estén rellenados
+				if (isset($registro['ubicacion_y']) && 
+					isset($registro['ubicacion_x']) && 
+					trim($registro['ubicacion_y']) != '' && 
+					trim($registro['ubicacion_x']) != '') {
+					
+					// Crear un nuevo registro solo con los campos necesarios
+					$registro_filtrado = array(
+						"sonda" => isset($registro['sonda']) ? $registro['sonda'] : '',
+						"fase" => isset($registro['fase']) ? $registro['fase'] : '',
+						"tiempo" => isset($registro['tiempo']) ? $registro['tiempo'] : '',
+						"ubicacion_y" => trim($registro['ubicacion_y']),
+						"ubicacion_x" => trim($registro['ubicacion_x'])
+					);
+					
+					// Agregar el registro al array plano (sin agrupar por fase)
+					$datos_filtrados[] = $registro_filtrado;
+				}
+			}
+		}
+	}
+	
+	return $datos_filtrados;
+}
+
+
 function getTemperatureReport($expeditionCode, $centerCode) {
 	 
 	 $m = new Movertis();
