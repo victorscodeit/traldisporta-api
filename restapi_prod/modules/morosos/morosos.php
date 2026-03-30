@@ -530,7 +530,7 @@ function sendReportMorosospdf(){
 	$listBySalesman = array();
 
 	$today = date("Y-m-d");
-	$lastYear = date("Y-m-d", strtotime($today . "- 1 year"));
+	$lastYear = date("Y-m-d", strtotime($today . "- 15 day"));
 
 	$path = 'http://localhost:8080/oms/morosos/';
 
@@ -878,7 +878,7 @@ function sendReportMorosos(){
     $listBySalesman = array();
 
     $today = date("Y-m-d");
-    $lastYear = date("Y-m-d", strtotime($today . "- 4 year"));
+    $lastYear = date("Y-m-d", strtotime($today . "- 15 day"));
 
     $path = 'http://localhost:8080/oms/morosos/';
 
@@ -1140,7 +1140,7 @@ function sendReportMorosos_csv(){
 	$listBySalesman = array();
 
 	$today = date("Y-m-d");
-	$lastYear = date("Y-m-d", strtotime($today . "- 4 year"));
+	$lastYear = date("Y-m-d", strtotime($today . "- 15 day"));
 
 	$path = 'http://localhost:8080/oms/morosos/';
 
