@@ -203,6 +203,7 @@ OUTER APPLY (
     SELECT TOP 1 d.DepoComiDe
     FROM DEPARTAM d
     WHERE d.CliCod = r.CliCod
+      AND d.DepCod = 0
     ORDER BY d.DepoComiDe DESC
 ) d
 LEFT JOIN USUARIOS u
