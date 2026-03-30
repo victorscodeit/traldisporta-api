@@ -362,7 +362,7 @@ function hasIncidence($customerCode, $dateInit = false, $dateEnd = false)
         WHERE c.HolCod = 0
           AND c.EmpCod IN (1,2)
           AND c.CinSit = 2
-          AND c.AnoCod IN (400,410)
+          AND c.AnoCod IN (410)
           AND c.CinRef = '" . $customerCode . "'
 
         UNION
@@ -382,7 +382,7 @@ function hasIncidence($customerCode, $dateInit = false, $dateEnd = false)
         WHERE c.HolCod = 0
           AND c.EmpCod IN (1,2)
           AND c.CinSit = 2
-          AND c.AnoCod IN (400,410)
+          AND c.AnoCod IN (410)
           AND EXISTS (
                 SELECT 1
                 FROM CINCIDE1 x
