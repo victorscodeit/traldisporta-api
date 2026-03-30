@@ -75,8 +75,15 @@ class Movertis
         return $rows0;
 
     }
-    public function checkreport($idVehicle,$initial_date,$end_date){
-		
+    private function createCheckreportHandle($idVehicle, $initial_date, $end_date)
+    {
+		$payload = json_encode(array(
+			"idVehicle" => array((int) $idVehicle),
+			"idReport" => array(16),
+			"initial_date" => (int) $initial_date,
+			"end_date" => (int) $end_date
+		));
+
 		$curl = curl_init();
 
 		curl_setopt_array($curl, array(
@@ -89,16 +96,7 @@ class Movertis
 		  CURLOPT_FOLLOWLOCATION => true,
 		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 		  CURLOPT_CUSTOMREQUEST => 'POST',
-		  CURLOPT_POSTFIELDS =>'{
-			"idVehicle": [
-				'.$idVehicle.'
-			],
-			"idReport": [
-				16
-			],
-			"initial_date": '.$initial_date.',
-			"end_date": '.$end_date.'
-		}',
+		  CURLOPT_POSTFIELDS => $payload,
 		  CURLOPT_HTTPHEADER => array(
 			'Authorization: 9a0ab49ab29426b087f8e68638760a13AB1DCFAB8F41E44A2C456FA153B313766AD32E7E',
 			'Content-Type: application/json'
@@ -110,21 +108,80 @@ class Movertis
 		  CURLOPT_SSL_VERIFYHOST => false,
 		));
 
+		return $curl;
+    }
+
+    public function checkreport($idVehicle,$initial_date,$end_date){
+		$curl = $this->createCheckreportHandle($idVehicle, $initial_date, $end_date);
 		$response = curl_exec($curl);
-		
+
 		if (curl_errno($curl)) {
-			//echo 'Error:' . curl_error($curl);
-		} else {
-			/*$http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-			echo "HTTP Status Code: " . $http_code . "\n";
-			echo "Response: " . $response;*/
+			curl_close($curl);
+			return array();
 		}
 
 		curl_close($curl);
-		return json_decode($response,true);
 
-		
-		
+		$data = json_decode($response, true);
+		return is_array($data) ? $data : array();
+	}
+
+	public function checkreportMulti($requests)
+	{
+		if (!is_array($requests) || count($requests) === 0) {
+			return array();
+		}
+
+		$multiHandle = curl_multi_init();
+		$handles = array();
+
+		foreach ($requests as $request) {
+			if (!isset($request['key'], $request['idVehicle'], $request['initial_date'], $request['end_date'])) {
+				continue;
+			}
+
+			$curl = $this->createCheckreportHandle($request['idVehicle'], $request['initial_date'], $request['end_date']);
+			$handleId = (int) $curl;
+			$handles[$handleId] = array(
+				'handle' => $curl,
+				'key' => $request['key']
+			);
+
+			curl_multi_add_handle($multiHandle, $curl);
+		}
+
+		do {
+			$multiExec = curl_multi_exec($multiHandle, $running);
+
+			if ($running && $multiExec === CURLM_OK) {
+				$selected = curl_multi_select($multiHandle, 1.0);
+				if ($selected === -1) {
+					usleep(100000);
+				}
+			}
+		} while ($running && $multiExec === CURLM_OK);
+
+		$responses = array();
+		foreach ($handles as $info) {
+			$response = curl_multi_getcontent($info['handle']);
+			$data = array();
+
+			if (!curl_errno($info['handle']) && $response !== false) {
+				$decoded = json_decode($response, true);
+				if (is_array($decoded)) {
+					$data = $decoded;
+				}
+			}
+
+			$responses[$info['key']] = $data;
+
+			curl_multi_remove_handle($multiHandle, $info['handle']);
+			curl_close($info['handle']);
+		}
+
+		curl_multi_close($multiHandle);
+
+		return $responses;
 	}
 	
 	public function showvehicles(){
