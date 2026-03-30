@@ -202,7 +202,7 @@ function getAuthorizationFromRequest()
     $token = "";
 
     foreach ($headers as $clave => $valor) {
-        if ($clave === 'Authorization' || $clave === 'Apikey'){
+        if (strtolower($clave) === 'authorization' || $clave === 'Apikey'){
             $found = true;
             //Agafem l'api key que esta en el header de la petició
             $token = $valor;
