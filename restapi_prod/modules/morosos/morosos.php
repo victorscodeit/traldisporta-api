@@ -908,12 +908,13 @@ function sendReportMorosos(){
 
 
 	$emailList = array(
-	"carles@porta.ad",
+	/*"carles@porta.ad",
 	"comptabilitat@traldisporta.com",
 	"admin@traldisporta.com",
 	"jordi.olle@porta.ad",
 	"victor@openmindsystems.com.es",
-	"ruben@porta.ad"
+	"ruben@porta.ad"*/
+    'victor.sancho.coma@gmail.com'
 	);
 
     $emailDefault = 'victor.sancho.coma@gmail.com';
