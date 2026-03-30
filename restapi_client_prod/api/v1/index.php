@@ -827,6 +827,247 @@ $app->post('/getTrucksExpedition', 'authenticate', function () use ($app) {
             echoResponse(HTTP_OK, $response);
     }
 });
+
+$app->post('/getExpeditionsData', 'authenticate', function () use ($app) {
+    $authCode = getAuthorizationFromRequest();
+
+    $requiredParams = array(
+        "year",
+        "month",
+        "centerCode"
+    );
+
+    verifyRequiredParams($requiredParams);
+
+    $params = json_decode($app->request->getBody(), true);
+
+    logging('getExpeditionsData', false, $params, $authCode);
+
+    $res = false;
+    if (!is_numeric($authCode)) {
+        $url = createURLAPI();
+        $res = CallAPI('POST', $url . '/getExpeditionsData', $authCode, $params);
+    } else {
+        $res = ERR_AUTHCODE_NOT_FOUND;
+    }
+
+    $response = array();
+    switch ($res) {
+        case ERR_CURL_REQUEST_FAILED:
+            $response = responseCURLRequestFailed();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        case ERR_JSON_DECODE_FAILED:
+            $response = responseJSONDecodeFailed();
+            echoResponse(HTTP_INTERNAL_ERROR, $response);
+            break;
+        case ERR_AUTHCODE_NOT_FOUND:
+            $response = responseAPIKeyNotFoundRequest();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        case ERR_TOKEN_NOT_EXIST:
+            $response = responseTokenNotExist();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        case ERR_CHECKSUM_NOT_FOUND:
+            $response = responseChecksumNotFound();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        case ERR_CHECKSUM_INVALID:
+            $response = responseChecksumInvalid();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        default:
+            $response = responseTrucks($res);
+            echoResponse(HTTP_OK, $response);
+    }
+});
+
+$app->post('/getSaleInvoices', 'authenticate', function () use ($app) {
+    $authCode = getAuthorizationFromRequest();
+    $requiredParams = array("dateInit", "dateEnd");
+    verifyRequiredParams($requiredParams);
+
+    $params = json_decode($app->request->getBody(), true);
+    logging('getSaleInvoices', false, $params, $authCode);
+
+    $res = false;
+    if (!is_numeric($authCode)) {
+        $url = createURLAPI();
+        $res = CallAPI('POST', $url . '/getSaleInvoices', $authCode, $params);
+    } else {
+        $res = ERR_AUTHCODE_NOT_FOUND;
+    }
+
+    switch ($res) {
+        case ERR_CURL_REQUEST_FAILED:
+            echoResponse(HTTP_BAD_REQUEST, responseCURLRequestFailed());
+            break;
+        case ERR_JSON_DECODE_FAILED:
+            echoResponse(HTTP_INTERNAL_ERROR, responseJSONDecodeFailed());
+            break;
+        case ERR_AUTHCODE_NOT_FOUND:
+            echoResponse(HTTP_BAD_REQUEST, responseAPIKeyNotFoundRequest());
+            break;
+        default:
+            echoResponse(HTTP_OK, $res);
+    }
+});
+
+$app->post('/getAllMovements', 'authenticate', function () use ($app) {
+    $authCode = getAuthorizationFromRequest();
+    $requiredParams = array("dateInit", "dateEnd");
+    verifyRequiredParams($requiredParams);
+
+    $params = json_decode($app->request->getBody(), true);
+    logging('getAllMovements', false, $params, $authCode);
+
+    $res = false;
+    if (!is_numeric($authCode)) {
+        $url = createURLAPI();
+        $res = CallAPI('POST', $url . '/getAllMovements', $authCode, $params);
+    } else {
+        $res = ERR_AUTHCODE_NOT_FOUND;
+    }
+
+    switch ($res) {
+        case ERR_CURL_REQUEST_FAILED:
+            echoResponse(HTTP_BAD_REQUEST, responseCURLRequestFailed());
+            break;
+        case ERR_JSON_DECODE_FAILED:
+            echoResponse(HTTP_INTERNAL_ERROR, responseJSONDecodeFailed());
+            break;
+        case ERR_AUTHCODE_NOT_FOUND:
+            echoResponse(HTTP_BAD_REQUEST, responseAPIKeyNotFoundRequest());
+            break;
+        default:
+            echoResponse(HTTP_OK, $res);
+    }
+});
+
+$app->post('/getBuyInvoices', 'authenticate', function () use ($app) {
+    $authCode = getAuthorizationFromRequest();
+    $requiredParams = array("dateInit", "dateEnd");
+    verifyRequiredParams($requiredParams);
+
+    $params = json_decode($app->request->getBody(), true);
+    logging('getBuyInvoices', false, $params, $authCode);
+
+    $res = false;
+    if (!is_numeric($authCode)) {
+        $url = createURLAPI();
+        $res = CallAPI('POST', $url . '/getBuyInvoices', $authCode, $params);
+    } else {
+        $res = ERR_AUTHCODE_NOT_FOUND;
+    }
+
+    switch ($res) {
+        case ERR_CURL_REQUEST_FAILED:
+            echoResponse(HTTP_BAD_REQUEST, responseCURLRequestFailed());
+            break;
+        case ERR_JSON_DECODE_FAILED:
+            echoResponse(HTTP_INTERNAL_ERROR, responseJSONDecodeFailed());
+            break;
+        case ERR_AUTHCODE_NOT_FOUND:
+            echoResponse(HTTP_BAD_REQUEST, responseAPIKeyNotFoundRequest());
+            break;
+        default:
+            echoResponse(HTTP_OK, $res);
+    }
+});
+
+$app->post('/getDetailInvoiceBuy', 'authenticate', function () use ($app) {
+    $authCode = getAuthorizationFromRequest();
+    $requiredParams = array("ImpFraNum", "ImpFraCtr", "ImpFraSer");
+    verifyRequiredParams($requiredParams);
+
+    $params = json_decode($app->request->getBody(), true);
+    logging('getDetailInvoiceBuy', false, $params, $authCode);
+
+    $res = false;
+    if (!is_numeric($authCode)) {
+        $url = createURLAPI();
+        $res = CallAPI('POST', $url . '/getDetailInvoiceBuy', $authCode, $params);
+    } else {
+        $res = ERR_AUTHCODE_NOT_FOUND;
+    }
+
+    switch ($res) {
+        case ERR_CURL_REQUEST_FAILED:
+            echoResponse(HTTP_BAD_REQUEST, responseCURLRequestFailed());
+            break;
+        case ERR_JSON_DECODE_FAILED:
+            echoResponse(HTTP_INTERNAL_ERROR, responseJSONDecodeFailed());
+            break;
+        case ERR_AUTHCODE_NOT_FOUND:
+            echoResponse(HTTP_BAD_REQUEST, responseAPIKeyNotFoundRequest());
+            break;
+        default:
+            echoResponse(HTTP_OK, $res);
+    }
+});
+
+$app->post('/getDetailInvoice', 'authenticate', function () use ($app) {
+    $authCode = getAuthorizationFromRequest();
+    $requiredParams = array("ImpFraNum", "ImpFraCtr", "ImpFraSer");
+    verifyRequiredParams($requiredParams);
+
+    $params = json_decode($app->request->getBody(), true);
+    logging('getDetailInvoice', false, $params, $authCode);
+
+    $res = false;
+    if (!is_numeric($authCode)) {
+        $url = createURLAPI();
+        $res = CallAPI('POST', $url . '/getDetailInvoice', $authCode, $params);
+    } else {
+        $res = ERR_AUTHCODE_NOT_FOUND;
+    }
+
+    switch ($res) {
+        case ERR_CURL_REQUEST_FAILED:
+            echoResponse(HTTP_BAD_REQUEST, responseCURLRequestFailed());
+            break;
+        case ERR_JSON_DECODE_FAILED:
+            echoResponse(HTTP_INTERNAL_ERROR, responseJSONDecodeFailed());
+            break;
+        case ERR_AUTHCODE_NOT_FOUND:
+            echoResponse(HTTP_BAD_REQUEST, responseAPIKeyNotFoundRequest());
+            break;
+        default:
+            echoResponse(HTTP_OK, $res);
+    }
+});
+
+$app->post('/getMonthlyMovements', 'authenticate', function () use ($app) {
+    $authCode = getAuthorizationFromRequest();
+    $requiredParams = array("month", "year");
+    verifyRequiredParams($requiredParams);
+
+    $params = json_decode($app->request->getBody(), true);
+    logging('getMonthlyMovements', false, $params, $authCode);
+
+    $res = false;
+    if (!is_numeric($authCode)) {
+        $url = createURLAPI();
+        $res = CallAPI('POST', $url . '/getMonthlyMovements', $authCode, $params);
+    } else {
+        $res = ERR_AUTHCODE_NOT_FOUND;
+    }
+
+    switch ($res) {
+        case ERR_CURL_REQUEST_FAILED:
+            echoResponse(HTTP_BAD_REQUEST, responseCURLRequestFailed());
+            break;
+        case ERR_JSON_DECODE_FAILED:
+            echoResponse(HTTP_INTERNAL_ERROR, responseJSONDecodeFailed());
+            break;
+        case ERR_AUTHCODE_NOT_FOUND:
+            echoResponse(HTTP_BAD_REQUEST, responseAPIKeyNotFoundRequest());
+            break;
+        default:
+            echoResponse(HTTP_OK, $res);
+    }
+});
 //REDUR
 $app->post('/getTemperatureDataREDUR', 'authenticate', function () use ($app) {
 	
