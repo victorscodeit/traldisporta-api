@@ -975,6 +975,54 @@ $app->post('/getTemperatureDataRAMONEDA', 'authenticate', function () use ($app)
 });
 
 
+$app->post('/morosos/send_report_morosos', 'authenticate', function () use ($app) {
+    $authCode = getAuthorizationFromRequest();
+    $payload = $app->request->getBody();
+    $targetUrl = 'http://91.187.69.73:8080/traldisporta-api/restapi_prod/v1/morosos/send_report_morosos';
+
+    // Guardem registre al log
+    $params = json_decode($payload, true);
+    logging('morosos_send_report_morosos', false, $params, $authCode);
+
+    $headers = array('Content-Type: application/json');
+    if (!is_numeric($authCode)) {
+        $headers[] = 'Authorization: ' . $authCode;
+    }
+
+    $ch = curl_init($targetUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    if (!empty($payload)) {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    }
+
+    $responseBody = curl_exec($ch);
+    $statusCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($ch)) {
+        curl_close($ch);
+        $response = responseCURLRequestFailed();
+        echoResponse(HTTP_BAD_REQUEST, $response);
+        return;
+    }
+
+    curl_close($ch);
+
+    if ($statusCode <= 0) {
+        $statusCode = HTTP_OK;
+    }
+
+    $decoded = json_decode($responseBody, true);
+    if (is_array($decoded)) {
+        echoResponse($statusCode, $decoded);
+    } else {
+        $app->response()->setStatus($statusCode);
+        echo $responseBody;
+    }
+});
+
+
 
 //SERVEIS MTRANS PUBLICS - END
 
