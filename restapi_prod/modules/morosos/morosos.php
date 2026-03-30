@@ -172,7 +172,7 @@ function getFacturasPendientes($dateInit = false, $dateEnd = false, $salesman = 
     LEFT JOIN USUARIOS u ON d.DepoComiDe = u.UseCod 
     LEFT JOIN OPERACI1 o on r.regnum = o.RegNum and r.HolCod = o.HolCod and r.empCod = o.empCod and r.RegCtrCod = o.RegCtrCod and r.RegSer = o.RegSer AND o.RegTip = r.RegTip 
     WHERE 1=1 AND v.RgVtoEst = 1 " . $dateFilter . " " . $salesmanFilter . " 
-    AND r.HolCod = 0 AND r.EmpCod in (1,2) AND r.RegCtrCod in (8,25,80) AND r.RegTip = 'V' AND v.RgVtoDat < DATEADD(MONTH, -1, GETDATE()) 
+    AND r.HolCod = 0 AND r.EmpCod in (1,2) AND r.RegCtrCod in (8,25,80) AND r.RegTip = 'V' AND v.RgVtoDat < DATEADD(DAY, -15, GETDATE()) 
 
     ";
     $select_invoices="SELECT
@@ -224,7 +224,7 @@ WHERE v.RgVtoEst = 1
   AND r.EmpCod IN (1,2)
   AND r.RegCtrCod IN (8,25,80)
   AND r.RegTip = 'V'
-  AND v.RgVtoPre < DATEADD(MONTH, -1, GETDATE())
+  AND v.RgVtoPre < DATEADD(DAY, -15, GETDATE())
   ORDER BY v.RgVtoImp ASC;
 ";
 
@@ -863,15 +863,15 @@ function sendReportMorosos(){
 
 
 	$emailList = array(
-	"carles@porta.ad",
+	/*"carles@porta.ad",
 	"comptabilitat@traldisporta.com",
 	"admin@traldisporta.com",
 	"jordi.olle@porta.ad",
 	"victor@openmindsystems.com.es",
-	"ruben@porta.ad"
+	"ruben@porta.ad"*/
 	);
 
-    $emailDefault = 'victor@openmindsystems.com.es';
+    $emailDefault = 'victor.sancho.coma@gmail.com';
 
     $listBySalesmanEmpty = array();
     $listBySalesman = array();
