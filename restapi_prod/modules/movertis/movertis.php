@@ -84,7 +84,8 @@ class Movertis
 		  CURLOPT_RETURNTRANSFER => true,
 		  CURLOPT_ENCODING => '',
 		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_CONNECTTIMEOUT => 5,
+		  CURLOPT_TIMEOUT => 20,
 		  CURLOPT_FOLLOWLOCATION => true,
 		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 		  CURLOPT_CUSTOMREQUEST => 'POST',
@@ -102,7 +103,7 @@ class Movertis
 			'Authorization: 9a0ab49ab29426b087f8e68638760a13AB1DCFAB8F41E44A2C456FA153B313766AD32E7E',
 			'Content-Type: application/json'
 		  ),
-		  CURLOPT_VERBOSE => true,
+		  CURLOPT_VERBOSE => false,
 		  CURLOPT_FAILONERROR => true,
 		  CURLOPT_HEADER => false,
 		  CURLOPT_SSL_VERIFYPEER => false,
@@ -127,7 +128,20 @@ class Movertis
 	}
 	
 	public function showvehicles(){
-		
+		$cacheFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'movertis_showvehicles_cache.json';
+		$cacheTtlSeconds = 300; // 5 minutos
+
+		// Intentamos servir desde cache para evitar una llamada externa en cada request.
+		if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTtlSeconds)) {
+			$cachedContent = @file_get_contents($cacheFile);
+			if ($cachedContent !== false) {
+				$cachedData = json_decode($cachedContent, true);
+				if (is_array($cachedData)) {
+					return $cachedData;
+				}
+			}
+		}
+
 		$curl = curl_init();
 
 		curl_setopt_array($curl, array(
@@ -135,7 +149,8 @@ class Movertis
 		  CURLOPT_RETURNTRANSFER => true,
 		  CURLOPT_ENCODING => '',
 		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_CONNECTTIMEOUT => 5,
+		  CURLOPT_TIMEOUT => 20,
 		  CURLOPT_FOLLOWLOCATION => true,
 		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 		  CURLOPT_CUSTOMREQUEST => 'POST',
@@ -150,7 +165,7 @@ class Movertis
 			'Authorization: 9a0ab49ab29426b087f8e68638760a13AB1DCFAB8F41E44A2C456FA153B313766AD32E7E',
 			'Content-Type: application/json'
 		  ),
-		  CURLOPT_VERBOSE => true,
+		  CURLOPT_VERBOSE => false,
 		  CURLOPT_FAILONERROR => true,
 		  CURLOPT_HEADER => false,
 		  CURLOPT_SSL_VERIFYPEER => false,
@@ -168,7 +183,14 @@ class Movertis
 		}
 
 		curl_close($curl);
-		return json_decode($response,true);
+		$data = json_decode($response, true);
+
+		if (is_array($data)) {
+			@file_put_contents($cacheFile, json_encode($data));
+			return $data;
+		}
+
+		return array();
 		
     }
     public function getTrucksExpedition($expeditionCode, $centerCode)

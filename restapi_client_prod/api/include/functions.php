@@ -454,7 +454,9 @@ function CallAPI($method, $url, $authorizationCode = false, $data = false)
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); //Retornem la resposta en comptes d'imprimir-la
     curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
     curl_setopt($ch, CURLOPT_HEADER, 1); // Ens permet obtenir el header de resposta
-    curl_setopt($ch, CURLOPT_VERBOSE, true);
+    curl_setopt($ch, CURLOPT_VERBOSE, false);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
     //Executem la petició
     $response = curl_exec($ch);
