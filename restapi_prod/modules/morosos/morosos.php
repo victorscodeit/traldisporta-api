@@ -367,15 +367,24 @@ function hasIncidence($customerCode, $dateInit = false, $dateEnd = false)
         $rows = sqlsrv_has_rows($incidents);
         if ($rows === true){
             while ($fila = sqlsrv_fetch_array($incidents, SQLSRV_FETCH_ASSOC)) {
-                #com que fem un return, nomes s'executara 1 vegada, donant-nos la primera fila del select
-                #que representa que es el resultat mes recent.
-                return $fila;
+                # Amb LEFT JOIN pot haver-hi fila de CINCIDEN sense CINCIDE1: GinRegDat null. Saltem.
+                if (!empty($fila['GinRegDat']) && $fila['GinRegDat'] instanceof \DateTimeInterface) {
+                    return $fila;
+                }
             }
         }
-        else{
-            return false;
-        }
+        return false;
     }
+    return false;
+}
+
+/** Formata GinRegDat (sqlsrv DateTime) per a sortida; buit si és null. */
+function formatMorosoGinRegDat($ginRegDat)
+{
+    if ($ginRegDat instanceof \DateTimeInterface) {
+        return $ginRegDat->format('d/m/Y');
+    }
+    return '';
 }
 
 #A partir d'un codi de client retorna el llistat d'incidencies de tipo gestion de cobro
@@ -646,9 +655,9 @@ function sendReportMorosospdf(){
 
 				$hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
 				if ($hasIncidence != false) {
-					$lastManagementDate = $hasIncidence['GinRegDat']->format("d/m/Y");
-					$manager = utf8_encode($hasIncidence['GinAsiUse']);
-					$lastComment = utf8_encode($hasIncidence['CinDes1']);
+					$lastManagementDate = formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
+					$manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
+					$lastComment = utf8_encode($hasIncidence['CinDes1'] ?? '');
 				}
 				$dateLastPayment="";	
 				if ($line["lastPaymentDate"] != '') {
@@ -798,9 +807,9 @@ function sendReportMorosospdf(){
 		
 				$hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
 				if ($hasIncidence != false) {
-					$lastManagementDate = $hasIncidence['GinRegDat']->format("d/m/Y");
-					$manager = utf8_encode($hasIncidence['GinAsiUse']);
-					$lastComment = utf8_encode($hasIncidence['CinDes1']);
+					$lastManagementDate = formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
+					$manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
+					$lastComment = utf8_encode($hasIncidence['CinDes1'] ?? '');
 				}
 		
 				if ($line["lastPaymentDate"] != '') {
@@ -1009,9 +1018,9 @@ function sendReportMorosos(){
 
                 $hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
                 if ($hasIncidence != false) {
-                    $lastManagementDate = $hasIncidence['GinRegDat']->format("d/m/Y");
-                    $manager = utf8_encode($hasIncidence['GinAsiUse']);
-                    $lastComment = $this->sanitizeComment(utf8_encode($hasIncidence['CinDes1']));
+                    $lastManagementDate = formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
+                    $manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
+                    $lastComment = $this->sanitizeComment(utf8_encode($hasIncidence['CinDes1'] ?? ''));
                 }
                 $dateLastPayment = '';
                 if (!empty($line["lastPaymentDate"])) {
@@ -1233,9 +1242,9 @@ foreach ($list as $codCompany => $company){
 
 					$hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
 					if ($hasIncidence != false) {
-						$lastManagementDate = $hasIncidence['GinRegDat']->format("d/m/Y");
-						$manager = utf8_encode($hasIncidence['GinAsiUse']);
-						$lastComment = $this->sanitizeComment(utf8_encode($hasIncidence['CinDes1']));
+						$lastManagementDate = formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
+						$manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
+						$lastComment = $this->sanitizeComment(utf8_encode($hasIncidence['CinDes1'] ?? ''));
 					}
 					$dateLastPayment="";	
 					if ($line["lastPaymentDate"] != '') {
