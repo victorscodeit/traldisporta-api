@@ -655,7 +655,7 @@ function sendReportMorosospdf(){
 
 				$hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
 				if ($hasIncidence != false) {
-					$lastManagementDate = formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
+					$lastManagementDate = $this->formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
 					$manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
 					$lastComment = utf8_encode($hasIncidence['CinDes1'] ?? '');
 				}
@@ -807,7 +807,7 @@ function sendReportMorosospdf(){
 		
 				$hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
 				if ($hasIncidence != false) {
-					$lastManagementDate = formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
+					$lastManagementDate = $this->formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
 					$manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
 					$lastComment = utf8_encode($hasIncidence['CinDes1'] ?? '');
 				}
@@ -1018,7 +1018,7 @@ function sendReportMorosos(){
 
                 $hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
                 if ($hasIncidence != false) {
-                    $lastManagementDate = formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
+                    $lastManagementDate = $this->formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
                     $manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
                     $lastComment = $this->sanitizeComment(utf8_encode($hasIncidence['CinDes1'] ?? ''));
                 }
@@ -1242,7 +1242,7 @@ foreach ($list as $codCompany => $company){
 
 					$hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
 					if ($hasIncidence != false) {
-						$lastManagementDate = formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
+						$lastManagementDate = $this->formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
 						$manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
 						$lastComment = $this->sanitizeComment(utf8_encode($hasIncidence['CinDes1'] ?? ''));
 					}
