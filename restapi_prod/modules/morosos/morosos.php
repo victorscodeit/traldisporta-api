@@ -342,55 +342,20 @@ function hasIncidence($customerCode, $dateInit = false, $dateEnd = false)
 
 
     $select_incidencias = "SELECT
-        q.GinAsiUse,
-        q.GinRegDat,
-        q.CinCod,
-        q.CinDes1
-    FROM (
-        SELECT
-            c1.GinAsiUse,
-            c1.GinRegDat,
-            c1.CinCod,
-            c1.GinModDat,
-            LTRIM(RTRIM(ISNULL(c1.GinIns1, ''))) + ' ' +
-            LTRIM(RTRIM(ISNULL(c1.GinIns2, ''))) + ' ' +
-            LTRIM(RTRIM(ISNULL(c1.GinIns3, ''))) + ' ' +
-            LTRIM(RTRIM(ISNULL(c1.GinIns4, ''))) AS CinDes1
-        FROM CINCIDEN c
-        INNER JOIN CINCIDE1 c1
-            ON c.CinCod = c1.CinCod
-        WHERE c.HolCod = 0
-          AND c.EmpCod IN (1,2)
-          AND c.CinSit = 2
-          AND c.AnoCod IN (410)
-          AND c.CinRef = '" . $customerCode . "'
-
-        UNION
-
-        SELECT
-            c1.GinAsiUse,
-            c1.GinRegDat,
-            c1.CinCod,
-            c1.GinModDat,
-            LTRIM(RTRIM(ISNULL(c1.GinIns1, ''))) + ' ' +
-            LTRIM(RTRIM(ISNULL(c1.GinIns2, ''))) + ' ' +
-            LTRIM(RTRIM(ISNULL(c1.GinIns3, ''))) + ' ' +
-            LTRIM(RTRIM(ISNULL(c1.GinIns4, ''))) AS CinDes1
-        FROM CINCIDEN c
-        INNER JOIN CINCIDE1 c1
-            ON c.CinCod = c1.CinCod
-        WHERE c.HolCod = 0
-          AND c.EmpCod IN (1,2)
-          AND c.CinSit = 2
-          AND c.AnoCod IN (410)
-          AND EXISTS (
-                SELECT 1
-                FROM CINCIDE1 x
-                WHERE x.CinCod = c.CinCod
-                  AND x.GinCliCod = '" . $customerCode . "'
-            )
-    ) q
-    ORDER BY q.GinModDat DESC";
+        c1.GinAsiUse,
+        c1.GinRegDat,
+        c1.CinCod,
+        LTRIM(RTRIM(ISNULL(c1.GinIns1, ''))) + ' ' +
+        LTRIM(RTRIM(ISNULL(c1.GinIns2, ''))) + ' ' +
+        LTRIM(RTRIM(ISNULL(c1.GinIns3, ''))) + ' ' +
+        LTRIM(RTRIM(ISNULL(c1.GinIns4, ''))) AS CinDes1
+    FROM CINCIDEN c
+    LEFT JOIN CINCIDE1 c1 ON c.CinCod = c1.CinCod
+    WHERE c.CinRef = '" . $customerCode . "'
+      AND c.AnoCod = 410
+      AND c.EmpCod IN (1,2)
+      AND c.CinSit = 2
+    ORDER BY c1.GinModDat DESC";
     /*if($customerCode=='2697'){
     print_r($select_incidencias);
 	die();
