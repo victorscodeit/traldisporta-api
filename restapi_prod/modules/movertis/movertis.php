@@ -20,13 +20,18 @@ date_default_timezone_set("Europe/Madrid");
 class Movertis
 {
     private $conn;
+    private $connLocal;
 
     function __construct()
     {
         require_once '../include/DbConnectExternal.php';
+        require_once '../include/DbConnect.php';
         // opening db connection
         $db = new DbConnectExternal();
         $this->conn = $db->connect();
+
+        $dbLocal = new DbConnect();
+        $this->connLocal = $dbLocal->connect();
     }
 	public function getExpeditions24()
     {
@@ -184,12 +189,97 @@ class Movertis
 		return $responses;
 	}
 	
-	public function showvehicles(){
+	private function ensureShowvehiclesCacheTable()
+	{
+		if (!$this->connLocal) {
+			return;
+		}
+
+		$sql = "CREATE TABLE IF NOT EXISTS movertis_showvehicles_cache (
+			id TINYINT NOT NULL PRIMARY KEY,
+			payload LONGTEXT NOT NULL,
+			updated_at DATETIME NOT NULL
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+		$this->connLocal->exec($sql);
+	}
+
+	private function getShowvehiclesFromDb($maxAgeMinutes = 30)
+	{
+		if (!$this->connLocal) {
+			return false;
+		}
+
+		$this->ensureShowvehiclesCacheTable();
+
+		$sql = "SELECT payload
+				FROM movertis_showvehicles_cache
+				WHERE id = 1
+				  AND updated_at >= DATE_SUB(NOW(), INTERVAL :minutes MINUTE)
+				LIMIT 1";
+		$stmt = $this->connLocal->prepare($sql);
+		$stmt->bindValue(':minutes', (int)$maxAgeMinutes, PDO::PARAM_INT);
+		$stmt->execute();
+		$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		if (!$row || empty($row['payload'])) {
+			return false;
+		}
+
+		$data = json_decode($row['payload'], true);
+		return is_array($data) ? $data : false;
+	}
+
+	private function saveShowvehiclesToDb($payload)
+	{
+		if (!$this->connLocal || !is_array($payload)) {
+			return;
+		}
+
+		$this->ensureShowvehiclesCacheTable();
+
+		$jsonPayload = json_encode($payload);
+		if ($jsonPayload === false) {
+			return;
+		}
+
+		$sql = "INSERT INTO movertis_showvehicles_cache (id, payload, updated_at)
+				VALUES (1, :payload, NOW())
+				ON DUPLICATE KEY UPDATE
+					payload = VALUES(payload),
+					updated_at = VALUES(updated_at)";
+		$stmt = $this->connLocal->prepare($sql);
+		$stmt->bindValue(':payload', $jsonPayload, PDO::PARAM_STR);
+		$stmt->execute();
+	}
+
+	private function getShowvehiclesFromDbAnyAge()
+	{
+		if (!$this->connLocal) {
+			return false;
+		}
+
+		$this->ensureShowvehiclesCacheTable();
+		$sql = "SELECT payload
+				FROM movertis_showvehicles_cache
+				WHERE id = 1
+				LIMIT 1";
+		$stmt = $this->connLocal->query($sql);
+		$row = $stmt ? $stmt->fetch(PDO::FETCH_ASSOC) : false;
+		if (!$row || empty($row['payload'])) {
+			return false;
+		}
+
+		$data = json_decode($row['payload'], true);
+		return is_array($data) ? $data : false;
+	}
+
+	private function fetchShowvehiclesRemote()
+	{
 		$cacheFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'movertis_showvehicles_cache.json';
-		$cacheTtlSeconds = 300; // 5 minutos
 
 		// Intentamos servir desde cache para evitar una llamada externa en cada request.
-		if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTtlSeconds)) {
+		if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < 300)) {
 			$cachedContent = @file_get_contents($cacheFile);
 			if ($cachedContent !== false) {
 				$cachedData = json_decode($cachedContent, true);
@@ -247,9 +337,38 @@ class Movertis
 			return $data;
 		}
 
+		return false;
+	}
+
+	public function showvehicles($forceRefresh = false){
+		try {
+			if (!$forceRefresh) {
+				$data = $this->getShowvehiclesFromDb(30);
+				if ($data !== false) {
+					return $data;
+				}
+			}
+
+			$data = $this->fetchShowvehiclesRemote();
+			if ($data !== false) {
+				$this->saveShowvehiclesToDb($data);
+				return $data;
+			}
+
+			// Fallback: devolver último valor de BD aunque sea antiguo.
+			$staleData = $this->getShowvehiclesFromDbAnyAge();
+			if ($staleData !== false) {
+				return $staleData;
+			}
+		} catch (Exception $e) {
+			$staleData = $this->getShowvehiclesFromDbAnyAge();
+			if ($staleData !== false) {
+				return $staleData;
+			}
+		}
+
 		return array();
-		
-    }
+	}
     public function getTrucksExpedition($expeditionCode, $centerCode)
     {
         $response = array();

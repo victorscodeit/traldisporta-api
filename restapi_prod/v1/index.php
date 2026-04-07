@@ -365,6 +365,18 @@ $app->post('/getTemperatureReportTest', 'authenticate', function () use ($app) {
 	echoResponse(HTTP_OK, $datos_finales);
 });
 
+$app->post('/getShowvehicles', 'authenticate', function () use ($app) {
+	$m = new Movertis();
+	$data = $m->showvehicles(false);
+	echoResponse(HTTP_OK, $data);
+});
+
+$app->post('/refreshShowvehicles', 'authenticate', function () use ($app) {
+	$m = new Movertis();
+	$data = $m->showvehicles(true);
+	echoResponse(HTTP_OK, $data);
+});
+
 $app->post('/getGPSExpeditionExternal', 'authenticate', function () use ($app) {
     //Camps necessitaris per aquesta petició
     $requiredParams = array(
