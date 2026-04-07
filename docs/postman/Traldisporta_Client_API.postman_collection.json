@@ -1,0 +1,303 @@
+{
+  "info": {
+    "_postman_id": "4a1175a6-8b84-4c02-9f49-0f9d7a8f4c10",
+    "name": "Traldisporta Client API",
+    "description": "Coleccion base para restapi_client_prod. Usa variables {{baseUrl}} y {{apiKey}}.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://api-traldisporta.com/api/v1" },
+    { "key": "apiKey", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Core",
+      "item": [
+        {
+          "name": "agenda",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"type\": \"ALL\"\n}" },
+            "url": "{{baseUrl}}/agenda"
+          }
+        },
+        {
+          "name": "companies",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{baseUrl}}/companies"
+          }
+        },
+        {
+          "name": "centers",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{baseUrl}}/centers"
+          }
+        },
+        {
+          "name": "categories",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{baseUrl}}/categories"
+          }
+        },
+        {
+          "name": "sections",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{baseUrl}}/sections"
+          }
+        },
+        {
+          "name": "sectors",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{baseUrl}}/sectors"
+          }
+        },
+        {
+          "name": "total_invoiced",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agenda_id\": \"\",\n  \"date_from\": \"2026-01-01\",\n  \"date_end\": \"2026-01-31\"\n}"
+            },
+            "url": "{{baseUrl}}/total_invoiced"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Temperature",
+      "item": [
+        {
+          "name": "getTrucksExpedition",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expeditionCode\": \"1191427\",\n  \"centerCode\": \"8\"\n}"
+            },
+            "url": "{{baseUrl}}/getTrucksExpedition"
+          }
+        },
+        {
+          "name": "getExpeditionsData",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"year\": 2026,\n  \"month\": 3,\n  \"centerCode\": 8,\n  \"startDate\": \"2026-03-01\",\n  \"endDate\": \"2026-03-02\"\n}"
+            },
+            "url": "{{baseUrl}}/getExpeditionsData"
+          }
+        },
+        {
+          "name": "getTemperatureDataREDUR",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"expeditionOrder\": \"57126674\"\n}" },
+            "url": "{{baseUrl}}/getTemperatureDataREDUR"
+          }
+        },
+        {
+          "name": "getTemperatureDataRAMONEDA",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"expeditionOrder\": \"57126674\"\n}" },
+            "url": "{{baseUrl}}/getTemperatureDataRAMONEDA"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Accounting",
+      "item": [
+        {
+          "name": "getSaleInvoices",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"dateInit\": \"2026-03-01\",\n  \"dateEnd\": \"2026-03-31\"\n}" },
+            "url": "{{baseUrl}}/getSaleInvoices"
+          }
+        },
+        {
+          "name": "getBuyInvoices",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"dateInit\": \"2026-03-01\",\n  \"dateEnd\": \"2026-03-31\"\n}" },
+            "url": "{{baseUrl}}/getBuyInvoices"
+          }
+        },
+        {
+          "name": "getAllMovements",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"dateInit\": \"2026-03-01\",\n  \"dateEnd\": \"2026-03-31\"\n}" },
+            "url": "{{baseUrl}}/getAllMovements"
+          }
+        },
+        {
+          "name": "getMonthlyMovements",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"month\": 3,\n  \"year\": 2026\n}" },
+            "url": "{{baseUrl}}/getMonthlyMovements"
+          }
+        },
+        {
+          "name": "getDetailInvoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"ImpFraNum\": \"12345\",\n  \"ImpFraCtr\": \"8\",\n  \"ImpFraSer\": \"A\"\n}" },
+            "url": "{{baseUrl}}/getDetailInvoice"
+          }
+        },
+        {
+          "name": "getDetailInvoiceBuy",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"ImpFraNum\": \"12345\",\n  \"ImpFraCtr\": \"8\",\n  \"ImpFraSer\": \"A\"\n}" },
+            "url": "{{baseUrl}}/getDetailInvoiceBuy"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Morosos",
+      "item": [
+        {
+          "name": "morosos/facturas_pendientes",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateInit\": \"2026-03-01\",\n  \"dateEnd\": \"2026-03-31\",\n  \"salesman\": \"\"\n}"
+            },
+            "url": "{{baseUrl}}/morosos/facturas_pendientes"
+          }
+        },
+        {
+          "name": "morosos/send_report_morosos",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{baseUrl}}/morosos/send_report_morosos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "newUser (authenticate2)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test User\",\n  \"username\": \"test.user\"\n}" },
+            "url": "{{baseUrl}}/newUser"
+          }
+        },
+        {
+          "name": "newPassword (authenticate2)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "{{apiKey}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"test.user\",\n  \"new_password\": \"NewPass123\"\n}" },
+            "url": "{{baseUrl}}/newPassword"
+          }
+        }
+      ]
+    }
+  ]
+}
