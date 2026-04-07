@@ -592,7 +592,7 @@ function getTemperatureReport($expeditionCode, $centerCode) {
     }
 	
 	$reportRequests = array();
-	foreach ($truckIds as $index => $truckId) {
+	foreach ($truckIds as $index => $truckId) { 
 		if ($truckId !== false) {
 			$reportRequests[] = array(
 				'key' => $index,
