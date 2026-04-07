@@ -633,7 +633,7 @@ function getTemperatureReport($expeditionCode, $centerCode) {
 			$datos = isset($reportsByIndex[$i]) ? $reportsByIndex[$i] : array();
 			//echo $truckPlates[$i]['truck'].",".$truckId.",".datetimeStrToTimestamp($truckPlates[$i]['start']).",".datetimeStrToTimestamp($truckPlates[$i]['finish']);
 			
-			if(is_array($datos) && count($datos[$truckId][0])>0){	
+			if (is_array($datos) && isset($datos[$truckId][0]) && is_array($datos[$truckId][0]) && count($datos[$truckId][0]) > 0) {
 			    if ($label=='Almacén' || $label=='Reparto' || $label=='Recogida'){$label=$truckPlates[$i]['truck'];}
 				if(isset($datos_finales[$label]) &&	is_array($datos_finales[$label])){		
 					$data=parseResponseInfo($truckId, $datos, $label, $truckId);
