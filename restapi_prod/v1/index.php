@@ -332,7 +332,7 @@ $app->post('/getTemperatureReportRamoneda', 'authenticate', function () use ($ap
 		if (!isset($order[0]['codigoOrdenante']) || (string)$order[0]['codigoOrdenante'] !== '1376') {
 			echoResponse(HTTP_BAD_REQUEST, array(
 				'error' => true,
-				'message' => 'Solo se permiten expediciones de Ramoneda (codigoOrdenante 1376).'
+				'message' => 'Expedicion no encontrada.'
 			));
 			return;
 		}
