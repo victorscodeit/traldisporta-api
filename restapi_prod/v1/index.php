@@ -591,23 +591,10 @@ function getTemperatureReport($expeditionCode, $centerCode) {
 		}
     }
 	
-	$reportRequests = array();
-	foreach ($truckIds as $index => $truckId) { 
-		if ($truckId !== false) {
-			$reportRequests[] = array(
-				'key' => $index,
-				'idVehicle' => $truckId,
-				'initial_date' => datetimeStrToTimestamp($truckPlates[$index]['start']),
-				'end_date' => datetimeStrToTimestamp($truckPlates[$index]['finish'])
-			);
-		}
-	}
-
-	$reportsByIndex = $m->checkreportMulti($reportRequests);
-
+	$i = 0;
 	$datos_finales=array();
 	
-    foreach ($truckIds as $i => $truckId) {
+    foreach ($truckIds as $truckId) {
         $label = "";
 		
         switch ($truckPlates[$i]['type']) {
@@ -630,7 +617,7 @@ function getTemperatureReport($expeditionCode, $centerCode) {
 		
         }else {
 			
-			$datos = isset($reportsByIndex[$i]) ? $reportsByIndex[$i] : array();
+			$datos=$m->checkreport($truckId,datetimeStrToTimestamp($truckPlates[$i]['start']),datetimeStrToTimestamp($truckPlates[$i]['finish']));
 			//echo $truckPlates[$i]['truck'].",".$truckId.",".datetimeStrToTimestamp($truckPlates[$i]['start']).",".datetimeStrToTimestamp($truckPlates[$i]['finish']);
 			
 			if (is_array($datos) && isset($datos[$truckId][0]) && is_array($datos[$truckId][0]) && count($datos[$truckId][0]) > 0) {
@@ -649,6 +636,7 @@ function getTemperatureReport($expeditionCode, $centerCode) {
 			}
 			
 		}
+		$i++;
 	}
 	//print_r($datos_finales);
 	//die();
