@@ -299,15 +299,6 @@ $app->post('/getTemperatureReportRedur', 'authenticate', function () use ($app) 
 	
 	$datos_finales=array();
 	if(count($order)>0){
-		// Solo se permite consultar expediciones de Ramoneda (codigoOrdenante = 1376)
-		if (!isset($order[0]['codigoOrdenante']) || (string)$order[0]['codigoOrdenante'] !== '1376') {
-			echoResponse(HTTP_BAD_REQUEST, array(
-				'error' => true,
-				'message' => 'Expedicion no encontrada.'
-			));
-			return;
-		}
-
 		if($order[0]['codigoExpedicion']!='' && $order[0]['codigoCentro']!=''){
 			$expeditionCode=$order[0]['codigoExpedicion'];
 			$centerCode=$order[0]['codigoCentro'];
@@ -337,6 +328,15 @@ $app->post('/getTemperatureReportRamoneda', 'authenticate', function () use ($ap
 	
 	$datos_finales=array();
 	if(count($order)>0){
+		// Solo se permite consultar expediciones de Ramoneda (codigoOrdenante = 1376)
+		if (!isset($order[0]['codigoOrdenante']) || (string)$order[0]['codigoOrdenante'] !== '1376') {
+			echoResponse(HTTP_BAD_REQUEST, array(
+				'error' => true,
+				'message' => 'Solo se permiten expediciones de Ramoneda (codigoOrdenante 1376).'
+			));
+			return;
+		}
+
 		if($order[0]['codigoExpedicion']!='' && $order[0]['codigoCentro']!=''){
 			$expeditionCode=$order[0]['codigoExpedicion'];
 			$centerCode=$order[0]['codigoCentro'];
