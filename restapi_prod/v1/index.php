@@ -949,10 +949,30 @@ function dateFusion($date, $hour) {
 }
 //A partir del llistat de camions, busquem l'id del camió que correspon a la matricula subministrada
 function getTruckIdFromResponse($truckPlate, $data) {
-  $datos=$data;
-  foreach ($datos as $truck) {
-    if ($truck["name"] == $truckPlate) {
-      return $truck["idVehicle"];
+  $normalize = function ($plate) {
+    $plate = strtoupper((string)$plate);
+    return str_replace(array(' ', '-'), '', $plate);
+  };
+
+  $target = $normalize($truckPlate);
+
+  $datasets = array();
+  if (is_array($data)) {
+    $datasets[] = $data;
+    if (isset($data['data']) && is_array($data['data'])) $datasets[] = $data['data'];
+    if (isset($data['result']) && is_array($data['result'])) $datasets[] = $data['result'];
+    if (isset($data['vehicles']) && is_array($data['vehicles'])) $datasets[] = $data['vehicles'];
+  }
+
+  foreach ($datasets as $datos) {
+    foreach ($datos as $truck) {
+      if (!is_array($truck) || !isset($truck['name'], $truck['idVehicle'])) {
+        continue;
+      }
+
+      if ($normalize($truck['name']) === $target) {
+        return $truck['idVehicle'];
+      }
     }
   }
 

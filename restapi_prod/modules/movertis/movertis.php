@@ -227,7 +227,18 @@ class Movertis
 		}
 
 		$data = json_decode($row['payload'], true);
-		return is_array($data) ? $data : false;
+		if (!is_array($data)) {
+			return false;
+		}
+
+		// Validamos que el payload tenga vehículos útiles.
+		foreach ($data as $item) {
+			if (is_array($item) && isset($item['name'], $item['idVehicle'])) {
+				return $data;
+			}
+		}
+
+		return false;
 	}
 
 	private function saveShowvehiclesToDb($payload)
@@ -271,7 +282,10 @@ class Movertis
 		}
 
 		$data = json_decode($row['payload'], true);
-		return is_array($data) ? $data : false;
+		if (!is_array($data)) {
+			return false;
+		}
+		return $data;
 	}
 
 	private function fetchShowvehiclesRemote()
