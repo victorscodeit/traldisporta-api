@@ -336,7 +336,7 @@ class Movertis
 		$response = curl_exec($curl);
 
 		if (curl_errno($curl)) {
-			echo 'Error:' . curl_error($curl);
+			// No imprimir en stdout: puede usarse desde jobs/cron
 		} else {
 			/*$http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 			echo "HTTP Status Code: " . $http_code . "\n";
@@ -352,6 +352,50 @@ class Movertis
 		}
 
 		return false;
+	}
+
+	/**
+	 * Solo lectura desde MySQL (movertis_showvehicles_cache). No llama a Movertis.
+	 * Para Ramoneda u otros flujos que no deben disparar showvehicles en caliente.
+	 */
+	public function showvehiclesDbOnly()
+	{
+		try {
+			$data = $this->getShowvehiclesFromDbAnyAge();
+			return is_array($data) ? $data : array();
+		} catch (Exception $e) {
+			return array();
+		}
+	}
+
+	/**
+	 * Obtiene showvehicles desde Movertis y persiste en BD. Pensado para cron/worker.
+	 * @return array{success:bool,saved:bool,message?:string}
+	 */
+	public function refreshShowvehiclesCache()
+	{
+		try {
+			$data = $this->fetchShowvehiclesRemote();
+			if ($data !== false && is_array($data)) {
+				$this->saveShowvehiclesToDb($data);
+				return array(
+					'success' => true,
+					'saved' => true,
+					'message' => 'Cache actualizada en base de datos.'
+				);
+			}
+			return array(
+				'success' => false,
+				'saved' => false,
+				'message' => 'No se pudo obtener showvehicles desde Movertis.'
+			);
+		} catch (Exception $e) {
+			return array(
+				'success' => false,
+				'saved' => false,
+				'message' => 'Error al actualizar cache: ' . $e->getMessage()
+			);
+		}
 	}
 
 	public function showvehicles($forceRefresh = false){

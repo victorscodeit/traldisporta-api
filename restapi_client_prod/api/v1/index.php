@@ -1215,6 +1215,43 @@ $app->post('/getTemperatureDataRAMONEDA', 'authenticate', function () use ($app)
     }
 });
 
+/** Proxy: refresca cache showvehicles en restapi_prod (POST vacío o {} al upstream). */
+$app->post('/refreshShowvehiclesCache', 'authenticate', function () use ($app) {
+	$authCode = getAuthorizationFromRequest();
+	logging('refreshShowvehiclesCache', false, array(), $authCode);
+
+	$res = false;
+	if (!is_numeric($authCode)) {
+		$url = createURLAPI();
+		$res = CallAPI('POST', $url . '/refreshShowvehiclesCache', $authCode, array());
+	} else {
+		$res = ERR_AUTHCODE_NOT_FOUND;
+	}
+
+	switch ($res) {
+		case ERR_CURL_REQUEST_FAILED:
+			echoResponse(HTTP_BAD_REQUEST, responseCURLRequestFailed());
+			break;
+		case ERR_JSON_DECODE_FAILED:
+			echoResponse(HTTP_INTERNAL_ERROR, responseJSONDecodeFailed());
+			break;
+		case ERR_AUTHCODE_NOT_FOUND:
+			echoResponse(HTTP_BAD_REQUEST, responseAPIKeyNotFoundRequest());
+			break;
+		case ERR_TOKEN_NOT_EXIST:
+			echoResponse(HTTP_BAD_REQUEST, responseTokenNotExist());
+			break;
+		case ERR_CHECKSUM_NOT_FOUND:
+			echoResponse(HTTP_BAD_REQUEST, responseChecksumNotFound());
+			break;
+		case ERR_CHECKSUM_INVALID:
+			echoResponse(HTTP_BAD_REQUEST, responseChecksumInvalid());
+			break;
+		default:
+			echoResponse(HTTP_OK, $res);
+	}
+});
+
 
 $app->post('/morosos/send_report_morosos', 'authenticate', function () use ($app) {
     $authCode = getAuthorizationFromRequest();

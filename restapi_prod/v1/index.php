@@ -304,7 +304,7 @@ $app->post('/getTemperatureReportRedur', 'authenticate', function () use ($app) 
 			$centerCode=$order[0]['codigoCentro'];
 			/*$expeditionCode=1075590;
 			$centerCode=8;*/
-			$datos_finales=getTemperatureReport($expeditionCode,$centerCode);
+			$datos_finales=getTemperatureReport($expeditionCode,$centerCode, false);
 
 		}
 	}
@@ -342,7 +342,8 @@ $app->post('/getTemperatureReportRamoneda', 'authenticate', function () use ($ap
 			$centerCode=$order[0]['codigoCentro'];
 			/*$expeditionCode=1075590;
 			$centerCode=8;*/
-			$datos_finales=getTemperatureReport($expeditionCode,$centerCode);
+			// Ramoneda: showvehicles solo desde BD (actualizar con POST /refreshShowvehiclesCache)
+			$datos_finales=getTemperatureReport($expeditionCode,$centerCode, true);
 
 		}
 	}
@@ -383,6 +384,13 @@ $app->post('/getShowvehicles', 'authenticate', function () use ($app) {
 $app->post('/refreshShowvehicles', 'authenticate', function () use ($app) {
 	$m = new Movertis();
 	$data = $m->showvehicles(true);
+	echoResponse(HTTP_OK, $data);
+});
+
+/** Actualiza movertis_showvehicles_cache en BD (Movertis remoto). Para cron sin devolver el listado completo. */
+$app->post('/refreshShowvehiclesCache', 'authenticate', function () use ($app) {
+	$m = new Movertis();
+	$data = $m->refreshShowvehiclesCache();
 	echoResponse(HTTP_OK, $data);
 });
 
@@ -469,7 +477,7 @@ function filterGPSData($datos) {
 }
 
 
-function getTemperatureReport($expeditionCode, $centerCode) {
+function getTemperatureReport($expeditionCode, $centerCode, $vehiclesDbOnly = false) {
 	 
 	 $m = new Movertis();
 	
@@ -588,7 +596,7 @@ function getTemperatureReport($expeditionCode, $centerCode) {
             }
 	}
 	
-	$sondas=$m->showvehicles();
+	$sondas = $vehiclesDbOnly ? $m->showvehiclesDbOnly() : $m->showvehicles();
 	
 	$truckIds=array();
 	foreach($truckPlates as $truck) {
