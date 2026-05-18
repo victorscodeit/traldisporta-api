@@ -455,14 +455,16 @@ function CallAPI($method, $url, $authorizationCode = false, $data = false)
     curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
     curl_setopt($ch, CURLOPT_HEADER, 1); // Ens permet obtenir el header de resposta
     curl_setopt($ch, CURLOPT_VERBOSE, false);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+    // getExpeditionsData puede tardar >2 min y ~1.6 MB; 90s cortaba con curl error 28
+    curl_setopt($ch, CURLOPT_TIMEOUT, 240);
 
     //Executem la petició
     $response = curl_exec($ch);
 
     //Comprovem si hi hagut algun tipus d'error a la petició
     if (curl_errno($ch)) {
+        error_log('CallAPI cURL error (' . curl_errno($ch) . '): ' . curl_error($ch) . ' | URL: ' . $url);
         return ERR_CURL_REQUEST_FAILED;
     }
 

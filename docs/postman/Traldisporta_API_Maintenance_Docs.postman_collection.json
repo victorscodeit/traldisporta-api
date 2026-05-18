@@ -1,0 +1,631 @@
+{
+  "info": {
+    "_postman_id": "c5f5638d-4fb4-4bc1-8c9a-6a5a1f0ad001",
+    "name": "TRALDISPORTA API - Technical Maintenance",
+    "description": "# TRALDISPORTA API - Technical Maintenance\n\nColeccion preparada para publicar documentacion tecnica mediante Postman Documenter.\n\n## Objetivo\n\nEsta coleccion documenta los endpoints principales expuestos por `restapi_client_prod`, la capa publica/proxy de la API de Traldisporta.\n\n## Arquitectura\n\nCliente externo -> `restapi_client_prod` -> `restapi_prod` -> Mtrans / MySQL / Movertis / SMTP.\n\n## Autenticacion\n\nUsar el header:\n\n`Authorization: {{apiKey}}`\n\nLa variable `apiKey` debe definirse en el entorno de Postman y no debe publicarse con valor real.\n\n## Variables\n\n- `baseUrl`: URL base publica. Por defecto `https://api-traldisporta.com/api/v1`.\n- `apiKey`: API key del consumidor.\n\n## Nota operativa\n\n`getExpeditionsData` puede tardar mas de 2 minutos y devolver respuestas de mas de 1 MB. Ante errores cURL, revisar timeouts y logs de `restapi_client_prod`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "Authorization",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.request.headers.upsert({ key: 'Content-Type', value: 'application/json' });"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api-traldisporta.com/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Master Data",
+      "description": "Endpoints de consulta de datos maestros procedentes de Mtrans.",
+      "item": [
+        {
+          "name": "Agenda",
+          "request": {
+            "method": "POST",
+            "description": "Consulta registros de agenda Mtrans. Usado como maestro de entidades/personas relacionadas.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"ALL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/agenda",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "agenda"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Companies",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve empresas disponibles en Mtrans.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/companies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "companies"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Centers",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve centros Mtrans.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/centers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "centers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Categories",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve categorias disponibles.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sections",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve secciones disponibles.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sections",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sections"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sectors",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve sectores disponibles.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sectors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sectors"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Expeditions and Temperature",
+      "description": "Endpoints relacionados con expediciones, camiones, GPS, temperatura y cache Movertis.",
+      "item": [
+        {
+          "name": "Get Expeditions Data",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve datos completos de expediciones para un periodo. Endpoint pesado: puede tardar mas de 2 minutos y devolver respuestas grandes. Consumido por integraciones como Odoo.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"year\": \"2026\",\n  \"month\": \"3\",\n  \"centerCode\": \"8\",\n  \"startDate\": \"2026-03-02\",\n  \"endDate\": \"2026-03-03\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getExpeditionsData",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getExpeditionsData"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Trucks Expedition",
+          "request": {
+            "method": "POST",
+            "description": "Obtiene camiones asociados a una expedicion y centro.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expeditionCode\": \"1191427\",\n  \"centerCode\": \"8\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getTrucksExpedition",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getTrucksExpedition"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Temperature Data REDUR",
+          "request": {
+            "method": "POST",
+            "description": "Obtiene informe de temperatura a partir de una orden de expedicion para flujo Redur.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expeditionOrder\": \"57126674\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getTemperatureDataREDUR",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getTemperatureDataREDUR"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Temperature Data RAMONEDA",
+          "request": {
+            "method": "POST",
+            "description": "Obtiene informe de temperatura para flujo Ramoneda. El backend valida que la expedicion pertenezca al ordenante permitido.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expeditionOrder\": \"57126674\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getTemperatureDataRAMONEDA",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getTemperatureDataRAMONEDA"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Refresh Showvehicles Cache",
+          "request": {
+            "method": "POST",
+            "description": "Refresca la cache de vehiculos Movertis usada por informes de temperatura.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/refreshShowvehiclesCache",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refreshShowvehiclesCache"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Accounting and Invoices",
+      "description": "Consultas contables, movimientos y detalle de facturas procedentes de Mtrans.",
+      "item": [
+        {
+          "name": "Get Sale Invoices",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve facturas de venta para un rango de fechas.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateInit\": \"2026-03-01\",\n  \"dateEnd\": \"2026-03-31\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getSaleInvoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getSaleInvoices"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Buy Invoices",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve facturas de compra para un rango de fechas.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateInit\": \"2026-03-01\",\n  \"dateEnd\": \"2026-03-31\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getBuyInvoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getBuyInvoices"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Detail Invoice",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve lineas de detalle de una factura de venta. El campo `TIva` se devuelve como codigo de IVA Mtrans.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ImpFraNum\": \"12345\",\n  \"ImpFraCtr\": \"25\",\n  \"ImpFraSer\": \"1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getDetailInvoice",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getDetailInvoice"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Detail Invoice Buy",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve lineas de detalle de una factura de compra.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ImpFraNum\": \"12345\",\n  \"ImpFraCtr\": \"25\",\n  \"ImpFraSer\": \"1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getDetailInvoiceBuy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getDetailInvoiceBuy"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Movements",
+          "request": {
+            "method": "POST",
+            "description": "Consulta movimientos contables en un rango de fechas.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateInit\": \"2026-03-01\",\n  \"dateEnd\": \"2026-03-31\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getAllMovements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getAllMovements"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Monthly Movements",
+          "request": {
+            "method": "POST",
+            "description": "Consulta movimientos contables de un mes concreto.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month\": \"3\",\n  \"year\": \"2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/getMonthlyMovements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "getMonthlyMovements"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Morosos",
+      "description": "Endpoints de morosidad, facturas pendientes y reporting.",
+      "item": [
+        {
+          "name": "Facturas Pendientes",
+          "request": {
+            "method": "POST",
+            "description": "Devuelve facturas pendientes de cobro en un rango de fechas. Puede filtrarse por comercial.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateInit\": \"2026-03-01\",\n  \"dateEnd\": \"2026-03-31\",\n  \"salesman\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/morosos/facturas_pendientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "morosos",
+                "facturas_pendientes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Send Report Morosos",
+          "request": {
+            "method": "POST",
+            "description": "Ejecuta el envio del reporte de morosos. Usar con precaucion en entornos productivos para evitar envios no deseados.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/morosos/send_report_morosos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "morosos",
+                "send_report_morosos"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Administration",
+      "description": "Operaciones administrativas. Requieren API key administrativa.",
+      "item": [
+        {
+          "name": "New User",
+          "request": {
+            "method": "POST",
+            "description": "Crea un nuevo usuario/API key. Requiere autenticacion administrativa.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"usuario\",\n  \"password\": \"password-segura\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/newUser",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "newUser"
+              ]
+            }
+          }
+        },
+        {
+          "name": "New Password",
+          "request": {
+            "method": "POST",
+            "description": "Cambia la password de un usuario. Requiere autenticacion administrativa.",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"usuario\",\n  \"password\": \"password-segura\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/newPassword",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "newPassword"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
