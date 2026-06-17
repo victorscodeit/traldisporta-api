@@ -23,7 +23,7 @@ define('DB_EXTERNAL_NAME', 'trans');*/
 
 define('DB_EXTERNAL_USERNAME', 'coffi.guy');
 define('DB_EXTERNAL_PASSWORD', 'Tyorpan4');
-define('DB_EXTERNAL_HOST', 'vhostsql2');
+define('DB_EXTERNAL_HOST', 'vhostsql1');
 define('DB_EXTERNAL_NAME', 'trans');
 
 //API KEY per les peticions d'usuaris que utilitzin el webservice
