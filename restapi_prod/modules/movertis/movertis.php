@@ -1145,13 +1145,12 @@ public function getKpiExpeditions($year, $month, $centerCode, $startDate = null,
 {
     $year = (int) $year;
     $month = (int) $month;
+    // centerCode se mantiene por compatibilidad con getExpeditionsData / Odoo.
+    // Como en getExpeditionsData, el alcance real es centros 8/25/80.
     $centerCode = (int) $centerCode;
 
     if ($year < 2000 || $year > 2100 || $month < 1 || $month > 12) {
         throw new InvalidArgumentException('El año o el mes no son válidos.');
-    }
-    if (!in_array($centerCode, [8, 25, 80], true)) {
-        throw new InvalidArgumentException('El centro debe ser 8, 25 o 80.');
     }
 
     if ($startDate && $endDate) {
@@ -1166,15 +1165,19 @@ public function getKpiExpeditions($year, $month, $centerCode, $startDate = null,
         throw new InvalidArgumentException('endDate no puede ser anterior a startDate.');
     }
 
+    // Fechas ya validadas (YYYY-MM-DD): se incrustan de forma segura para evitar
+    // batches multi-statement con PDO/sqlsrv (suelen romper y devolver HTML/error).
+    $startSql = str_replace("'", "''", $start);
+    $endSql = str_replace("'", "''", $end);
+
     /*
      * Se mantienen los centros y filtros funcionales de getExpeditionsData.
      * ROW_NUMBER deduplica ExpCod y conserva la expedición del centro más alto,
      * equivalente al último valor que sobrescribía el array del método anterior.
      */
-    $sqlScope = "
-        IF OBJECT_ID('tempdb..#KpiExpeditions') IS NOT NULL
-            DROP TABLE #KpiExpeditions;
+    $this->conn->exec("IF OBJECT_ID('tempdb..#KpiExpeditions') IS NOT NULL DROP TABLE #KpiExpeditions;");
 
+    $sqlScope = "
         WITH CandidateExpeditions AS (
             SELECT
                 ex.ExpCod,
@@ -1185,8 +1188,8 @@ public function getKpiExpeditions($year, $month, $centerCode, $startDate = null,
                 ) AS row_num
             FROM trans.dbo.EXPEDIC4 ex
             WHERE ISDATE(ex.ExpAltFec) = 1
-              AND CONVERT(date, ex.ExpAltFec, 103) >= :startDate
-              AND CONVERT(date, ex.ExpAltFec, 103) <= :endDate
+              AND CONVERT(date, ex.ExpAltFec, 103) >= '" . $startSql . "'
+              AND CONVERT(date, ex.ExpAltFec, 103) <= '" . $endSql . "'
               AND ex.ExpCtrCod IN (8, 25, 80)
               AND ex.ExpDsCtCd IN (8, 25, 80)
               AND ex.ExpDsCtCd <> ex.ExpCtrCod
@@ -1196,18 +1199,18 @@ public function getKpiExpeditions($year, $month, $centerCode, $startDate = null,
         INTO #KpiExpeditions
         FROM CandidateExpeditions
         WHERE row_num = 1;
-
-        CREATE UNIQUE CLUSTERED INDEX IX_KpiExpeditions
-            ON #KpiExpeditions (ExpCod, ExpCtrCod);
     ";
 
-    $scopeStatement = $this->conn->prepare($sqlScope);
-    $scopeStatement->bindValue(':startDate', $start, PDO::PARAM_STR);
-    $scopeStatement->bindValue(':endDate', $end, PDO::PARAM_STR);
-    $scopeStatement->execute();
-    $scopeStatement->closeCursor();
+    $this->conn->exec($sqlScope);
 
     try {
+        // Índice opcional: si falla, las consultas siguen siendo correctas.
+        try {
+            $this->conn->exec("CREATE UNIQUE CLUSTERED INDEX IX_KpiExpeditions ON #KpiExpeditions (ExpCod, ExpCtrCod);");
+        } catch (Exception $e) {
+            // ignore
+        }
+
         $sqlHeaders = "
             SELECT
                 ex.".Expedicion::CODE." AS ExpCod,
@@ -1235,7 +1238,7 @@ public function getKpiExpeditions($year, $month, $centerCode, $startDate = null,
                 ex.".Expedicion::RECOGIDACODE." AS ExpRecNum,
                 ex.".Expedicion::FECHAREGISTRO." AS ExpDatReg,
                 ex.".Expedicion::HORAREGISTRO." AS ExpHorReg,
-                ex.".Expedicion::FECHAHORAREGISTRO." AS ExpAltFecHora,
+                ex.".Expedicion::FECHSAL." AS ExpAltFecHora,
                 ex.".Expedicion::CODIGOMERCANCIA." AS MerCod,
                 ex.".Expedicion::CENTROCODEDESTI." AS ExpDsCtCd,
                 ex.".Expedicion::CODIGOEXPEDICIONTERCERO." AS ExpAlbOrd,
@@ -1335,7 +1338,11 @@ public function getKpiExpeditions($year, $month, $centerCode, $startDate = null,
 
         return $response;
     } finally {
-        $this->conn->exec("IF OBJECT_ID('tempdb..#KpiExpeditions') IS NOT NULL DROP TABLE #KpiExpeditions;");
+        try {
+            $this->conn->exec("IF OBJECT_ID('tempdb..#KpiExpeditions') IS NOT NULL DROP TABLE #KpiExpeditions;");
+        } catch (Exception $e) {
+            // ignore cleanup errors
+        }
     }
 }
 

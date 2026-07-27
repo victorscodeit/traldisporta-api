@@ -267,22 +267,33 @@ $app->post('/KPI_expeditions', 'authenticate', function () use ($app) {
 
     logging('KPI_expeditions', false, $params);
 
-    $m = new Movertis();
+    try {
+        $m = new Movertis();
 
-    $startDate = isset($params['startDate']) ? $params['startDate'] : null;
-    $endDate = isset($params['endDate']) ? $params['endDate'] : null;
+        $startDate = isset($params['startDate']) ? $params['startDate'] : null;
+        $endDate = isset($params['endDate']) ? $params['endDate'] : null;
 
-    $rows = $m->getKpiExpeditions(
-        $params['year'],
-        $params['month'],
-        $params['centerCode'],
-        $startDate,
-        $endDate
-    );
+        $rows = $m->getKpiExpeditions(
+            $params['year'],
+            $params['month'],
+            $params['centerCode'],
+            $startDate,
+            $endDate
+        );
 
-    $response = responseTrucks($rows);
-
-    echoResponse(HTTP_OK, $response);
+        $response = responseTrucks($rows);
+        echoResponse(HTTP_OK, $response);
+    } catch (InvalidArgumentException $e) {
+        echoResponse(HTTP_BAD_REQUEST, array(
+            'error' => true,
+            'message' => $e->getMessage()
+        ));
+    } catch (Exception $e) {
+        echoResponse(HTTP_INTERNAL_ERROR, array(
+            'error' => true,
+            'message' => 'Error en KPI_expeditions: ' . $e->getMessage()
+        ));
+    }
 });
 $app->post('/getTrucksExpedition', 'authenticate', function () use ($app) {
     //Camps necessitaris per aquesta petició
