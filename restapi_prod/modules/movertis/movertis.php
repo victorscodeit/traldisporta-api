@@ -1378,18 +1378,79 @@ private function kpiScalar($value)
 
 private function kpiDateTimeSortKey($fecha, $hora)
 {
-    $fecha = $this->kpiScalar($fecha);
-    $hora = $this->kpiScalar($hora);
-    if ($fecha === null) {
+    $combined = $this->kpiNormalizeDateTime($hora, $fecha);
+    if ($combined === null || !preg_match('/^\d{4}-\d{2}-\d{2}\s/', $combined)) {
         return null;
     }
-    $timePart = $hora;
-    if ($timePart !== null && preg_match('/\s(\d{1,2}:\d{2}(:\d{2})?)/', $timePart, $m)) {
-        $timePart = $m[1];
-    }
-    $combined = $timePart !== null ? ($fecha . ' ' . $timePart) : $fecha;
+
     $ts = strtotime($combined);
     return $ts === false ? null : $ts;
+}
+
+/**
+ * Devuelve únicamente fechas reales de Mtrans.
+ *
+ * Los valores 1753-01-01 son marcadores técnicos de SQL Server y no deben
+ * exponerse como fechas de negocio.
+ */
+private function kpiNormalizeDate($value)
+{
+    $value = $this->kpiScalar($value);
+    if ($value === null) {
+        return null;
+    }
+
+    if (!preg_match('/(\d{4}-\d{2}-\d{2})/', (string) $value, $match)) {
+        return null;
+    }
+
+    return (int) substr($match[1], 0, 4) > 1900 ? $value : null;
+}
+
+/**
+ * Normaliza los campos de hora de Mtrans.
+ *
+ * SQL Server representa algunas horas sin fecha usando 1753-01-01. Cuando
+ * existe una fecha asociada, se sustituye esa fecha técnica por la real.
+ */
+private function kpiNormalizeDateTime($value, $fallbackDate = null)
+{
+    $value = $this->kpiScalar($value);
+    $fallbackDate = $this->kpiScalar($fallbackDate);
+
+    if ($value === null) {
+        return null;
+    }
+
+    $datePart = null;
+    if (preg_match('/(\d{4}-\d{2}-\d{2})/', (string) $value, $dateMatch)) {
+        $year = (int) substr($dateMatch[1], 0, 4);
+        if ($year > 1900) {
+            $datePart = $dateMatch[1];
+        }
+    }
+
+    if ($datePart === null && $fallbackDate !== null) {
+        if (preg_match('/(\d{4}-\d{2}-\d{2})/', (string) $fallbackDate, $fallbackMatch)) {
+            $fallbackYear = (int) substr($fallbackMatch[1], 0, 4);
+            if ($fallbackYear > 1900) {
+                $datePart = $fallbackMatch[1];
+            }
+        }
+    }
+
+    $timePart = null;
+    if (preg_match('/(\d{1,2}:\d{2}:\d{2}(?:\.\d+)?)/', (string) $value, $timeMatch)) {
+        $timeParts = explode(':', $timeMatch[1], 2);
+        $timePart = str_pad($timeParts[0], 2, '0', STR_PAD_LEFT) . ':' . $timeParts[1];
+    }
+
+    if ($datePart === null || $timePart === null) {
+        return null;
+    }
+
+    // Nunca exponer la fecha técnica 1753 ni una hora sin fecha al consumidor.
+    return $datePart . ' ' . $timePart;
 }
 
 private function kpiMaxLlegadaAlmacen(array $almacenesRows)
@@ -1408,7 +1469,7 @@ private function kpiMaxLlegadaAlmacen(array $almacenesRows)
         if ($maxTs === null || $ts > $maxTs) {
             $maxTs = $ts;
             $maxFecha = $this->kpiScalar($fecha);
-            $maxHora = $this->kpiScalar($hora);
+            $maxHora = $this->kpiNormalizeDateTime($hora, $fecha);
         }
     }
 
@@ -1423,7 +1484,7 @@ private function mapExpeditionToKpi(array $exp)
     $cabecera = [
         'ExpCod' => $this->kpiScalar($exp['ExpCod'] ?? null),
         'ExpAltFec' => $this->kpiScalar($exp['ExpAltFec'] ?? null),
-        'ExpHorLle' => $this->kpiScalar($exp['ExpHorLle'] ?? null),
+        'ExpHorLle' => null,
         'AnoCod' => $this->kpiScalar($exp['AnoCod'] ?? null),
         'ExpCtrCod' => $this->kpiScalar($exp['ExpCtrCod'] ?? null),
         'ExpDsCtCd' => $this->kpiScalar($exp['ExpDsCtCd'] ?? null),
@@ -1441,8 +1502,11 @@ private function mapExpeditionToKpi(array $exp)
         'SecCod' => $this->kpiScalar($exp['SecCod'] ?? null),
         'MerCod' => $this->kpiScalar($exp['MerCod'] ?? null),
         'ExpRecNum' => $this->kpiScalar($exp['ExpRecNum'] ?? null),
-        'ExpDatReg' => $this->kpiScalar($exp['ExpDatReg'] ?? null),
-        'ExpHorReg' => $this->kpiScalar($exp['ExpHorReg'] ?? null),
+        'ExpDatReg' => $this->kpiNormalizeDate($exp['ExpDatReg'] ?? null),
+        'ExpHorReg' => $this->kpiNormalizeDateTime(
+            $exp['ExpHorReg'] ?? null,
+            $exp['ExpAltFecHora'] ?? ($exp['ExpAltFec'] ?? null)
+        ),
         'ExpAltFecHora' => $this->kpiScalar($exp['ExpAltFecHora'] ?? null),
         'ExpOrdDes' => $this->kpiScalar($exp['ExpOrdDes'] ?? null),
         'ExpAlbOrd' => $this->kpiScalar($exp['ExpAlbOrd'] ?? null),
@@ -1462,9 +1526,13 @@ private function mapExpeditionToKpi(array $exp)
         if (!is_array($row)) {
             continue;
         }
+        $fechaLlegada = $this->kpiNormalizeDate($row['fechaLlegadaCarga'] ?? null);
         $almacenes[] = [
-            'fechaLlegadaCarga' => $this->kpiScalar($row['fechaLlegadaCarga'] ?? null),
-            'horaLlegadaCarga' => $this->kpiScalar($row['horaLlegadaCarga'] ?? null),
+            'fechaLlegadaCarga' => $fechaLlegada,
+            'horaLlegadaCarga' => $this->kpiNormalizeDateTime(
+                $row['horaLlegadaCarga'] ?? null,
+                $fechaLlegada
+            ),
         ];
     }
 
@@ -1473,15 +1541,23 @@ private function mapExpeditionToKpi(array $exp)
         if (!is_array($row)) {
             continue;
         }
+        $fechaEntregaRow = $this->kpiNormalizeDate($row['fechaEntrega'] ?? null);
         $repartos[] = [
-            'horaEntrega' => $this->kpiScalar($row['horaEntrega'] ?? null),
-            'fechaEntrega' => $this->kpiScalar($row['fechaEntrega'] ?? null),
+            'horaEntrega' => $this->kpiNormalizeDateTime(
+                $row['horaEntrega'] ?? null,
+                $fechaEntregaRow
+            ),
+            'fechaEntrega' => $fechaEntregaRow,
             'transportistaNombre' => $this->kpiScalar($row['transportistaNombre'] ?? null),
             'matriculaVehiculo' => $this->kpiScalar($row['matriculaVehiculo'] ?? null),
         ];
     }
 
     $maxLlegada = $this->kpiMaxLlegadaAlmacen($almacenes);
+    $cabecera['ExpHorLle'] = $this->kpiNormalizeDateTime(
+        $exp['ExpHorLle'] ?? null,
+        $maxLlegada['fechaLlegadaCargaMax'] ?? ($exp['ExpAltFec'] ?? null)
+    );
     $horaEntrega = null;
     $fechaEntrega = null;
     if (count($repartos) > 0) {
