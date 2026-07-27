@@ -883,6 +883,61 @@ $app->post('/getExpeditionsData', 'authenticate', function () use ($app) {
     }
 });
 
+$app->post('/KPI_expeditions', 'authenticate', function () use ($app) {
+    $authCode = getAuthorizationFromRequest();
+
+    $requiredParams = array(
+        "year",
+        "month",
+        "centerCode"
+    );
+
+    verifyRequiredParams($requiredParams);
+
+    $params = json_decode($app->request->getBody(), true);
+
+    logging('KPI_expeditions', false, $params, $authCode);
+
+    $res = false;
+    if (!is_numeric($authCode)) {
+        $url = createURLAPI();
+        $res = CallAPI('POST', $url . '/KPI_expeditions', $authCode, $params);
+    } else {
+        $res = ERR_AUTHCODE_NOT_FOUND;
+    }
+
+    $response = array();
+    switch ($res) {
+        case ERR_CURL_REQUEST_FAILED:
+            $response = responseCURLRequestFailed();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        case ERR_JSON_DECODE_FAILED:
+            $response = responseJSONDecodeFailed();
+            echoResponse(HTTP_INTERNAL_ERROR, $response);
+            break;
+        case ERR_AUTHCODE_NOT_FOUND:
+            $response = responseAPIKeyNotFoundRequest();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        case ERR_TOKEN_NOT_EXIST:
+            $response = responseTokenNotExist();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        case ERR_CHECKSUM_NOT_FOUND:
+            $response = responseChecksumNotFound();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        case ERR_CHECKSUM_INVALID:
+            $response = responseChecksumInvalid();
+            echoResponse(HTTP_BAD_REQUEST, $response);
+            break;
+        default:
+            $response = responseTrucks($res);
+            echoResponse(HTTP_OK, $response);
+    }
+});
+
 $app->post('/getSaleInvoices', 'authenticate', function () use ($app) {
     $authCode = getAuthorizationFromRequest();
     $requiredParams = array("dateInit", "dateEnd");

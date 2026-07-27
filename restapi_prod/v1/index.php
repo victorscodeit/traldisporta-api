@@ -253,6 +253,37 @@ $app->post('/getExpeditionsData', 'authenticate', function () use ($app) {
 
     echoResponse(HTTP_OK, $response);
 });
+$app->post('/KPI_expeditions', 'authenticate', function () use ($app) {
+
+    $requiredParams = array(
+        "year",
+        "month",
+        "centerCode"
+    );
+
+    verifyRequiredParams($requiredParams);
+
+    $params = json_decode($app->request->getBody(), true);
+
+    logging('KPI_expeditions', false, $params);
+
+    $m = new Movertis();
+
+    $startDate = isset($params['startDate']) ? $params['startDate'] : null;
+    $endDate = isset($params['endDate']) ? $params['endDate'] : null;
+
+    $rows = $m->getKpiExpeditions(
+        $params['year'],
+        $params['month'],
+        $params['centerCode'],
+        $startDate,
+        $endDate
+    );
+
+    $response = responseTrucks($rows);
+
+    echoResponse(HTTP_OK, $response);
+});
 $app->post('/getTrucksExpedition', 'authenticate', function () use ($app) {
     //Camps necessitaris per aquesta petició
     $requiredParams = array(

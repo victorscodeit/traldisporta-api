@@ -242,6 +242,32 @@
           }
         },
         {
+          "name": "KPI Expeditions",
+          "request": {
+            "method": "POST",
+            "description": "Mismos parametros que getExpeditionsData. Devuelve lista deduplicada por ExpCod con cabecera KPI, ficha opcional, almacenes, repartos, horaLlegadaCargaMax y horaEntrega (primer reparto).",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"year\": \"2026\",\n  \"month\": \"3\",\n  \"centerCode\": \"8\",\n  \"startDate\": \"2026-03-02\",\n  \"endDate\": \"2026-03-03\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/KPI_expeditions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "KPI_expeditions"
+              ]
+            }
+          }
+        },
+        {
           "name": "Get Trucks Expedition",
           "request": {
             "method": "POST",

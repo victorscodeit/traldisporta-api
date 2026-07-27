@@ -1134,6 +1134,366 @@ public function getExpeditionsData($year, $month, $centerCode, $startDate = null
     return $responseFinal;
 }
 
+/**
+ * Expediciones en formato KPI con consultas SQL propias.
+ *
+ * Evita llamar a getExpeditionsData y elimina su patrón N+1. El conjunto de
+ * expediciones se calcula una vez en una tabla temporal y se reutiliza para
+ * consultar cabeceras, almacenes y repartos.
+ */
+public function getKpiExpeditions($year, $month, $centerCode, $startDate = null, $endDate = null)
+{
+    $year = (int) $year;
+    $month = (int) $month;
+    $centerCode = (int) $centerCode;
+
+    if ($year < 2000 || $year > 2100 || $month < 1 || $month > 12) {
+        throw new InvalidArgumentException('El año o el mes no son válidos.');
+    }
+    if (!in_array($centerCode, [8, 25, 80], true)) {
+        throw new InvalidArgumentException('El centro debe ser 8, 25 o 80.');
+    }
+
+    if ($startDate && $endDate) {
+        $start = $this->validateKpiDate($startDate, 'startDate');
+        $end = $this->validateKpiDate($endDate, 'endDate');
+    } else {
+        $start = sprintf('%04d-%02d-01', $year, $month);
+        $end = date('Y-m-d', strtotime($start . ' +1 day'));
+    }
+
+    if ($end < $start) {
+        throw new InvalidArgumentException('endDate no puede ser anterior a startDate.');
+    }
+
+    /*
+     * Se mantienen los centros y filtros funcionales de getExpeditionsData.
+     * ROW_NUMBER deduplica ExpCod y conserva la expedición del centro más alto,
+     * equivalente al último valor que sobrescribía el array del método anterior.
+     */
+    $sqlScope = "
+        IF OBJECT_ID('tempdb..#KpiExpeditions') IS NOT NULL
+            DROP TABLE #KpiExpeditions;
+
+        WITH CandidateExpeditions AS (
+            SELECT
+                ex.ExpCod,
+                ex.ExpCtrCod,
+                ROW_NUMBER() OVER (
+                    PARTITION BY ex.ExpCod
+                    ORDER BY ex.ExpCtrCod DESC
+                ) AS row_num
+            FROM trans.dbo.EXPEDIC4 ex
+            WHERE ISDATE(ex.ExpAltFec) = 1
+              AND CONVERT(date, ex.ExpAltFec, 103) >= :startDate
+              AND CONVERT(date, ex.ExpAltFec, 103) <= :endDate
+              AND ex.ExpCtrCod IN (8, 25, 80)
+              AND ex.ExpDsCtCd IN (8, 25, 80)
+              AND ex.ExpDsCtCd <> ex.ExpCtrCod
+              AND ex.ExpSit = 7
+        )
+        SELECT ExpCod, ExpCtrCod
+        INTO #KpiExpeditions
+        FROM CandidateExpeditions
+        WHERE row_num = 1;
+
+        CREATE UNIQUE CLUSTERED INDEX IX_KpiExpeditions
+            ON #KpiExpeditions (ExpCod, ExpCtrCod);
+    ";
+
+    $scopeStatement = $this->conn->prepare($sqlScope);
+    $scopeStatement->bindValue(':startDate', $start, PDO::PARAM_STR);
+    $scopeStatement->bindValue(':endDate', $end, PDO::PARAM_STR);
+    $scopeStatement->execute();
+    $scopeStatement->closeCursor();
+
+    try {
+        $sqlHeaders = "
+            SELECT
+                ex.".Expedicion::CODE." AS ExpCod,
+                ex.".Expedicion::HOLDINGCODE." AS HolCod,
+                ex.".Expedicion::CONTRATOCODE." AS ExpCntCod,
+                ex.".Expedicion::SECCIONCODE." AS SecCod,
+                ex.".Expedicion::CENTROCODE." AS ExpCtrCod,
+                ex.".Expedicion::FECHSAL." AS ExpAltFec,
+                ex.".Expedicion::FECHALLE." AS ExpHorLle,
+                ex.".Expedicion::CIUDADSAL." AS ExpOloPob,
+                ex.".Expedicion::POBLACIONDESTINACION." AS ExpDesPob,
+                ex.".Expedicion::DESTINATARIO." AS ExpDesDes,
+                ex.".Expedicion::DIRECCIONDESTINATARIO." AS ExpDesDom,
+                ex.".Expedicion::PAISDESTINATARIOCODE." AS ExpDesPai,
+                ex.".Expedicion::PAISDESTINATARIOISO." AS ExpDesNem,
+                ex.".Expedicion::CPDESTINATARIO." AS ExpDesPos,
+                ex.".Expedicion::ORDENANTE." AS ExpOrdDes,
+                ex.".Expedicion::CODIGOORDENANTE." AS ExpOrdCod,
+                ex.".Expedicion::REMITENTE." AS ExpRemDes,
+                ex.".Expedicion::DIRECCIONREMITENTE." AS ExpRemDom,
+                ex.".Expedicion::POBLACIONREMITENTE." AS ExpRemPob,
+                ex.".Expedicion::CPREMITENTE." AS ExpRemPos,
+                ex.".Expedicion::PAISREMITENTECODE." AS ExpRemPai,
+                ex.".Expedicion::PAISREMITENTEISO." AS ExpRemNem,
+                ex.".Expedicion::RECOGIDACODE." AS ExpRecNum,
+                ex.".Expedicion::FECHAREGISTRO." AS ExpDatReg,
+                ex.".Expedicion::HORAREGISTRO." AS ExpHorReg,
+                ex.".Expedicion::FECHAHORAREGISTRO." AS ExpAltFecHora,
+                ex.".Expedicion::CODIGOMERCANCIA." AS MerCod,
+                ex.".Expedicion::CENTROCODEDESTI." AS ExpDsCtCd,
+                ex.".Expedicion::CODIGOEXPEDICIONTERCERO." AS ExpAlbOrd,
+                ex.ExpSit,
+                (
+                    SELECT MAX(ci.AnoCod)
+                    FROM CINCIDEN ci
+                    WHERE ci.CinRef = ex.ExpCod
+                      AND ci.CtrCod = ex.ExpCtrCod
+                ) AS AnoCod
+            FROM ".Expedicion::TABLE." ex
+            INNER JOIN #KpiExpeditions scope
+                ON scope.ExpCod = ex.ExpCod
+               AND scope.ExpCtrCod = ex.ExpCtrCod
+            ORDER BY ex.ExpCod;
+        ";
+
+        $headerRows = $this->conn->query($sqlHeaders, PDO::FETCH_ASSOC)->fetchAll();
+        if (empty($headerRows)) {
+            return [];
+        }
+
+        $expeditions = [];
+        foreach ($headerRows as $row) {
+            $expCod = (string) $row['ExpCod'];
+            $row['almacenes'] = [];
+            $row['repartos'] = [];
+            $expeditions[$expCod] = $row;
+        }
+
+        $sqlWarehouses = "
+            SELECT
+                c1.".Carga::EXPCODE." AS ExpCod,
+                c.".Carga::FECHALLEGADA." AS fechaLlegadaCarga,
+                c.".Carga::HORALLEGADA." AS horaLlegadaCarga
+            FROM ".Carga::TABLE." c1
+            INNER JOIN #KpiExpeditions scope
+                ON scope.ExpCod = c1.".Carga::EXPCODE."
+               AND scope.ExpCtrCod = c1.".Carga::CENTROCODE."
+            INNER JOIN ".CargaDetalle::TABLE." c
+                ON c1.".Carga::CODE." = c.".CargaDetalle::CODE."
+               AND c1.".Carga::CENTROCODE." = c.".CargaDetalle::CENTROCODE."
+            INNER JOIN ".Contrato::TABLE." co
+                ON co.".Contrato::CODE." = c.".CargaDetalle::CONTRATOCODE."
+            INNER JOIN ".Expedicion::TABLE." ex
+                ON ex.".Expedicion::CODE." = c1.".Carga::EXPCODE."
+               AND ex.".Expedicion::CENTROCODE." = c1.".Carga::CENTROCODE."
+            WHERE c.".CargaDetalle::FECHAALTA." >= ex.".Expedicion::FECHAREGISTRO."
+              AND co.".Contrato::FECHASALIDA." >= ex.".Expedicion::FECHAREGISTRO."
+            ORDER BY
+                c1.".Carga::EXPCODE.",
+                c.".Carga::FECHALLEGADA.",
+                c.".Carga::HORALLEGADA.";
+        ";
+
+        $warehouseRows = $this->conn->query($sqlWarehouses, PDO::FETCH_ASSOC)->fetchAll();
+        foreach ($warehouseRows as $row) {
+            $expCod = (string) $row['ExpCod'];
+            if (!isset($expeditions[$expCod])) {
+                continue;
+            }
+            unset($row['ExpCod']);
+            $expeditions[$expCod]['almacenes'][] = $row;
+        }
+
+        $sqlDeliveries = "
+            SELECT
+                delivery.".Entrega::EXPCODE." AS ExpCod,
+                delivery.".Entrega::HORAENTREGA." AS horaEntrega,
+                delivery.".Entrega::FECHAENTREGA." AS fechaEntrega,
+                RTRIM(delivery.".Entrega::TRANSPORTISTANOMBRE.") AS transportistaNombre,
+                RTRIM(delivery.".Entrega::MATRICULAVEHICULO.") AS matriculaVehiculo
+            FROM ".Entrega::TABLE." delivery
+            INNER JOIN #KpiExpeditions scope
+                ON scope.ExpCod = delivery.".Entrega::EXPCODE."
+               AND scope.ExpCtrCod = delivery.".Entrega::CENTROCODIGO."
+            ORDER BY
+                delivery.".Entrega::EXPCODE.",
+                delivery.".Entrega::FECHAENTREGA.",
+                delivery.".Entrega::HORAENTREGA.";
+        ";
+
+        $deliveryRows = $this->conn->query($sqlDeliveries, PDO::FETCH_ASSOC)->fetchAll();
+        foreach ($deliveryRows as $row) {
+            $expCod = (string) $row['ExpCod'];
+            if (!isset($expeditions[$expCod])) {
+                continue;
+            }
+            unset($row['ExpCod']);
+            $expeditions[$expCod]['repartos'][] = $row;
+        }
+
+        $response = [];
+        foreach ($expeditions as $expedition) {
+            $response[] = $this->mapExpeditionToKpi($expedition);
+        }
+
+        return $response;
+    } finally {
+        $this->conn->exec("IF OBJECT_ID('tempdb..#KpiExpeditions') IS NOT NULL DROP TABLE #KpiExpeditions;");
+    }
+}
+
+private function validateKpiDate($value, $field)
+{
+    $date = DateTime::createFromFormat('!Y-m-d', (string) $value);
+    $errors = DateTime::getLastErrors();
+    if (
+        !$date
+        || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))
+        || $date->format('Y-m-d') !== (string) $value
+    ) {
+        throw new InvalidArgumentException($field . ' debe tener formato YYYY-MM-DD.');
+    }
+
+    return $date->format('Y-m-d');
+}
+
+private function kpiScalar($value)
+{
+    if ($value === null) {
+        return null;
+    }
+    if ($value instanceof DateTimeInterface) {
+        return $value->format('Y-m-d H:i:s');
+    }
+    if (is_string($value)) {
+        $trimmed = trim($value);
+        return $trimmed === '' ? null : $trimmed;
+    }
+    return $value;
+}
+
+private function kpiDateTimeSortKey($fecha, $hora)
+{
+    $fecha = $this->kpiScalar($fecha);
+    $hora = $this->kpiScalar($hora);
+    if ($fecha === null) {
+        return null;
+    }
+    $timePart = $hora;
+    if ($timePart !== null && preg_match('/\s(\d{1,2}:\d{2}(:\d{2})?)/', $timePart, $m)) {
+        $timePart = $m[1];
+    }
+    $combined = $timePart !== null ? ($fecha . ' ' . $timePart) : $fecha;
+    $ts = strtotime($combined);
+    return $ts === false ? null : $ts;
+}
+
+private function kpiMaxLlegadaAlmacen(array $almacenesRows)
+{
+    $maxTs = null;
+    $maxFecha = null;
+    $maxHora = null;
+
+    foreach ($almacenesRows as $row) {
+        $fecha = $row['fechaLlegadaCarga'] ?? null;
+        $hora = $row['horaLlegadaCarga'] ?? null;
+        $ts = $this->kpiDateTimeSortKey($fecha, $hora);
+        if ($ts === null) {
+            continue;
+        }
+        if ($maxTs === null || $ts > $maxTs) {
+            $maxTs = $ts;
+            $maxFecha = $this->kpiScalar($fecha);
+            $maxHora = $this->kpiScalar($hora);
+        }
+    }
+
+    return [
+        'fechaLlegadaCargaMax' => $maxFecha,
+        'horaLlegadaCargaMax' => $maxHora,
+    ];
+}
+
+private function mapExpeditionToKpi(array $exp)
+{
+    $cabecera = [
+        'ExpCod' => $this->kpiScalar($exp['ExpCod'] ?? null),
+        'ExpAltFec' => $this->kpiScalar($exp['ExpAltFec'] ?? null),
+        'ExpHorLle' => $this->kpiScalar($exp['ExpHorLle'] ?? null),
+        'AnoCod' => $this->kpiScalar($exp['AnoCod'] ?? null),
+        'ExpCtrCod' => $this->kpiScalar($exp['ExpCtrCod'] ?? null),
+        'ExpDsCtCd' => $this->kpiScalar($exp['ExpDsCtCd'] ?? null),
+        'ExpSit' => $this->kpiScalar($exp['ExpSit'] ?? null),
+        'ExpDesPob' => $this->kpiScalar($exp['ExpDesPob'] ?? null),
+        'ExpDesDes' => $this->kpiScalar($exp['ExpDesDes'] ?? null),
+        'ExpOloPob' => $this->kpiScalar($exp['ExpOloPob'] ?? null),
+        'ExpOrdCod' => $this->kpiScalar($exp['ExpOrdCod'] ?? null),
+        'ExpDesDom' => $this->kpiScalar($exp['ExpDesDom'] ?? null),
+    ];
+
+    $ficha = [
+        'HolCod' => $this->kpiScalar($exp['HolCod'] ?? null),
+        'ExpCntCod' => $this->kpiScalar($exp['ExpCntCod'] ?? null),
+        'SecCod' => $this->kpiScalar($exp['SecCod'] ?? null),
+        'MerCod' => $this->kpiScalar($exp['MerCod'] ?? null),
+        'ExpRecNum' => $this->kpiScalar($exp['ExpRecNum'] ?? null),
+        'ExpDatReg' => $this->kpiScalar($exp['ExpDatReg'] ?? null),
+        'ExpHorReg' => $this->kpiScalar($exp['ExpHorReg'] ?? null),
+        'ExpAltFecHora' => $this->kpiScalar($exp['ExpAltFecHora'] ?? null),
+        'ExpOrdDes' => $this->kpiScalar($exp['ExpOrdDes'] ?? null),
+        'ExpAlbOrd' => $this->kpiScalar($exp['ExpAlbOrd'] ?? null),
+        'ExpRemDes' => $this->kpiScalar($exp['ExpRemDes'] ?? null),
+        'ExpRemDom' => $this->kpiScalar($exp['ExpRemDom'] ?? null),
+        'ExpRemPob' => $this->kpiScalar($exp['ExpRemPob'] ?? null),
+        'ExpRemPos' => $this->kpiScalar($exp['ExpRemPos'] ?? null),
+        'ExpRemPai' => $this->kpiScalar($exp['ExpRemPai'] ?? null),
+        'ExpRemNem' => $this->kpiScalar($exp['ExpRemNem'] ?? null),
+        'ExpDesPos' => $this->kpiScalar($exp['ExpDesPos'] ?? null),
+        'ExpDesPai' => $this->kpiScalar($exp['ExpDesPai'] ?? null),
+        'ExpDesNem' => $this->kpiScalar($exp['ExpDesNem'] ?? null),
+    ];
+
+    $almacenes = [];
+    foreach ($exp['almacenes'] ?? [] as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $almacenes[] = [
+            'fechaLlegadaCarga' => $this->kpiScalar($row['fechaLlegadaCarga'] ?? null),
+            'horaLlegadaCarga' => $this->kpiScalar($row['horaLlegadaCarga'] ?? null),
+        ];
+    }
+
+    $repartos = [];
+    foreach ($exp['repartos'] ?? [] as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $repartos[] = [
+            'horaEntrega' => $this->kpiScalar($row['horaEntrega'] ?? null),
+            'fechaEntrega' => $this->kpiScalar($row['fechaEntrega'] ?? null),
+            'transportistaNombre' => $this->kpiScalar($row['transportistaNombre'] ?? null),
+            'matriculaVehiculo' => $this->kpiScalar($row['matriculaVehiculo'] ?? null),
+        ];
+    }
+
+    $maxLlegada = $this->kpiMaxLlegadaAlmacen($almacenes);
+    $horaEntrega = null;
+    $fechaEntrega = null;
+    if (count($repartos) > 0) {
+        $horaEntrega = $repartos[0]['horaEntrega'];
+        $fechaEntrega = $repartos[0]['fechaEntrega'];
+    }
+
+    return [
+        'cabecera' => $cabecera,
+        'ficha' => $ficha,
+        'almacenes' => $almacenes,
+        'repartos' => $repartos,
+        'horaLlegadaCargaMax' => $maxLlegada['horaLlegadaCargaMax'],
+        'fechaLlegadaCargaMax' => $maxLlegada['fechaLlegadaCargaMax'],
+        'horaEntrega' => $horaEntrega,
+        'fechaEntrega' => $fechaEntrega,
+    ];
+}
+
 	
 }
 
