@@ -1,0 +1,51 @@
+{
+    "error": false,
+    "message": "Centres carregats: 3",
+    "data": [
+        {
+            "holding": "0",
+            "id": "8",
+            "companyCode": "1",
+            "countryId": "34",
+            "countryIdISO": "ES",
+            "name": "Centro 8",
+            "address": "Poligon 8",
+            "zip": "08001",
+            "city_id": "1",
+            "city_name": "Barcelona",
+            "phone": "933000008",
+            "fax": null,
+            "email": "c8@traldis.test"
+        },
+        {
+            "holding": "0",
+            "id": "25",
+            "companyCode": "1",
+            "countryId": "34",
+            "countryIdISO": "ES",
+            "name": "Centro 25",
+            "address": "Poligon 25",
+            "zip": "08001",
+            "city_id": "1",
+            "city_name": "Barcelona",
+            "phone": "933000025",
+            "fax": null,
+            "email": "c25@traldis.test"
+        },
+        {
+            "holding": "0",
+            "id": "80",
+            "companyCode": "1",
+            "countryId": "34",
+            "countryIdISO": "ES",
+            "name": "Centro 80",
+            "address": "Poligon 80",
+            "zip": "08001",
+            "city_id": "1",
+            "city_name": "Barcelona",
+            "phone": "933000080",
+            "fax": null,
+            "email": "c80@traldis.test"
+        }
+    ]
+}

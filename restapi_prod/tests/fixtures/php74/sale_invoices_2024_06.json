@@ -1,0 +1,23 @@
+[
+    {
+        "EmpCod": "1",
+        "CliCod": "1001",
+        "RegCliNom": "Cliente Test SL                                                                 ",
+        "RegCliDir": "Carrer Client 1                                                                 ",
+        "RegCliPos": "08001     ",
+        "RegCliPob": "Barcelona                               ",
+        "RegCliNif": "B00000001           ",
+        "RegAsiCod": "500",
+        "RegTip": "V",
+        "RegCtrCod": "8",
+        "RegSer": "1",
+        "RegNum": "100",
+        "RegDatEmi": "2024-06-15 00:00:00.000",
+        "RegRenNum": "0",
+        "RegIva1I": "21.00",
+        "RegIva2I": ".00",
+        "Total": "1000.00",
+        "PaiNem": "ES  ",
+        "GrpAgeCod": "GRP1                "
+    }
+]

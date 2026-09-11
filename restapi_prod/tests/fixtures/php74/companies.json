@@ -1,0 +1,40 @@
+{
+    "error": false,
+    "message": "Companyies carregades: 2",
+    "data": [
+        {
+            "holding": "0",
+            "id": "1",
+            "nameFiscal": "Traldisporta Test SA",
+            "nameComercial": "Traldisporta",
+            "countryId": "34",
+            "cif": "A00000001",
+            "address": "Carrer Test 1",
+            "zip": "08001",
+            "city": "Barcelona",
+            "regMercantil": "RM Barcelona",
+            "phone1": "933000001",
+            "phone2": "933000002",
+            "fax": "933000003",
+            "email": "info@traldis.test",
+            "web": "www.traldis.test"
+        },
+        {
+            "holding": "0",
+            "id": "2",
+            "nameFiscal": "Segunda Test SL",
+            "nameComercial": "Segunda",
+            "countryId": "34",
+            "cif": "A00000002",
+            "address": "Carrer Test 2",
+            "zip": "08001",
+            "city": "Barcelona",
+            "regMercantil": "RM Barcelona",
+            "phone1": "933000004",
+            "phone2": null,
+            "fax": null,
+            "email": "info2@traldis.test",
+            "web": null
+        }
+    ]
+}

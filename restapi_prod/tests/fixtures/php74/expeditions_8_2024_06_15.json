@@ -1,0 +1,97 @@
+{
+    "error": false,
+    "message": "This trucks are related to this expedition",
+    "data": {
+        "40001": {
+            "ExpCod": "40001",
+            "HolCod": "0",
+            "ExpCntCod": "8001",
+            "SecCod": "1",
+            "ExpCtrCod": "8",
+            "ExpAltFec": "15\/06\/2024",
+            "ExpHorLle": "16\/06\/2024",
+            "ExpOloPob": "Barcelona                               ",
+            "ExpDesPob": "Madrid                                  ",
+            "ExpOrdDes": "Ordenante Test                                                                  ",
+            "ExpRemDes": "Remitente Test                                                                  ",
+            "ExpRemDom": "Carrer Rem 1                                                                    ",
+            "ExpRemPai": "34",
+            "ExpRemNem": "ES  ",
+            "ExpRemPos": "08001     ",
+            "ExpRemPob": "Barcelona                               ",
+            "ExpDesDes": "Destinatario Test                                                               ",
+            "ExpDesDom": "Carrer Des 1                                                                    ",
+            "ExpDesPai": "34",
+            "ExpDesNem": "ES  ",
+            "ExpDesPos": "28001     ",
+            "ExpRecNum": "5001",
+            "ExpDatReg": "2024-06-14",
+            "ExpHorReg": "08:00:00",
+            "ExpAltFecHora": "15\/06\/2024",
+            "MerCod": "1",
+            "ExpDsCtCd": "80",
+            "ExpAlbOrd": "ORD-40001                               ",
+            "ExpOrdCod": "1001",
+            "ExpSit": "7",
+            "AnoCod": null,
+            "recogidas": [
+                {
+                    "codigoRecogida": "5001",
+                    "codigoCentro": "8",
+                    "codigoEmpresaRecogida": "1001",
+                    "empresaRecogida": "Remitente Test",
+                    "direccionRecogida": "Carrer Rem 1",
+                    "codigoPaisRecogida": "34",
+                    "codigoPaisISORecogida": "ES  ",
+                    "codigoPostalRecogida": "08001     ",
+                    "poblacionRecogida": "Barcelona",
+                    "codigoTransportista": "9",
+                    "nombreTransportista": "Conductor Test",
+                    "matriculaVehiculo": "1234ABC",
+                    "descripcionVehiculo": "Camion test",
+                    "fechaSalida": "2024-06-15 07:00:00",
+                    "horaSalida": "2024-06-15 07:00:00",
+                    "fechaLlegada": "2024-06-15 09:00:00",
+                    "horaLlegada": "2024-06-15 09:00:00"
+                }
+            ],
+            "almacenes": [
+                {
+                    "poblacionOrigen": "Barcelona",
+                    "paisOrigenCodigo": "34",
+                    "poblacionDestino": "Madrid",
+                    "paisDestinoCodigo": "34",
+                    "fechaCarga": "2024-06-15 08:00:00",
+                    "horaCarga": "2024-06-15 08:00:00",
+                    "fechaLlegadaCarga": "2024-06-15 18:00:00",
+                    "horaLlegadaCarga": "2024-06-15 18:00:00",
+                    "matriculaCamion": "1234ABC",
+                    "matriculaRemolque": "5678DEF",
+                    "conductorCodigo": "9",
+                    "transportistaCodigo": "20",
+                    "transportistaNombre": "Transportista Test",
+                    "tipusMercaderia": "1",
+                    "dataHoraRegistre": "15\/06\/2024",
+                    "centreDesti": "80",
+                    "centreOrigen": "8"
+                }
+            ],
+            "salas": [],
+            "repartos": [
+                {
+                    "transportistaCodigo": "20",
+                    "transportistaNombre": "Transportista Test",
+                    "matriculaVehiculo": "1234ABC",
+                    "descripcionVehiculo": "Camion test",
+                    "fechaSalida": "2024-06-16 08:00:00",
+                    "horaSalida": "2024-06-16 08:00:00",
+                    "fechaEntrega": "2024-06-16 18:00:00",
+                    "horaEntrega": "2024-06-16 18:00:00",
+                    "fechaHoraAsignable": "2024-06-16 08:00:00"
+                }
+            ]
+        },
+        "25": [],
+        "80": []
+    }
+}

@@ -26,7 +26,7 @@ class DbHandlerExternal
 
     function __construct()
     {
-        require_once dirname(__FILE__) . './DbConnectExternal.php';
+        require_once dirname(__FILE__) . '/DbConnectExternal.php';
         // opening db connection
         $db = new DbConnectExternal();
         $this->conn = $db->connect();

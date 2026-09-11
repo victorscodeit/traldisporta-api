@@ -21,7 +21,7 @@ class DbConnect
      */
     function connect()
     {
-        include_once dirname(__FILE__) . './Config.php';
+        include_once dirname(__FILE__) . '/Config.php';
 
         try {
             $this->conn = new PDO(

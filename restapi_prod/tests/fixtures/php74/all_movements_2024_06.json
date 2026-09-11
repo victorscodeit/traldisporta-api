@@ -1,0 +1,32 @@
+[
+    {
+        "MvtCod": "9001",
+        "EmpCod": "1",
+        "MvtApuVal": "Apu KPI                                 ",
+        "CtaCod": "6000000001  ",
+        "MvtImpDeb": "250.00",
+        "MvtImpHab": ".00",
+        "MvtCon": "KPI test                                                                        ",
+        "CtaCodVir": null
+    },
+    {
+        "MvtCod": "9002",
+        "EmpCod": "1",
+        "MvtApuVal": "Cierre                                  ",
+        "CtaCod": "6000000001  ",
+        "MvtImpDeb": "10.00",
+        "MvtImpHab": ".00",
+        "MvtCon": "Cierre                                                                          ",
+        "CtaCodVir": null
+    },
+    {
+        "MvtCod": "9100",
+        "EmpCod": "1",
+        "MvtApuVal": "Asiento suelto                          ",
+        "CtaCod": "6000000001  ",
+        "MvtImpDeb": "75.00",
+        "MvtImpHab": ".00",
+        "MvtCon": "Libre                                                                           ",
+        "CtaCodVir": null
+    }
+]

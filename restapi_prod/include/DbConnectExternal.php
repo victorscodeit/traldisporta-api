@@ -21,13 +21,15 @@ class DbConnectExternal
      */
     function connect()
     {
-        include_once dirname(__FILE__) . './Config.php';
+        include_once dirname(__FILE__) . '/Config.php';
 
         try {
+            $dsn = 'sqlsrv:server=' . DB_EXTERNAL_HOST . ';Database=' . DB_EXTERNAL_NAME;
+            if (getenv('DB_EXTERNAL_TRUST_CERT')) {
+                $dsn .= ';Encrypt=yes;TrustServerCertificate=1';
+            }
             $this->conn = new PDO(
-                'sqlsrv:server=' .
-                DB_EXTERNAL_HOST . ';Database=' .
-                DB_EXTERNAL_NAME,
+                $dsn,
                 DB_EXTERNAL_USERNAME,
                 DB_EXTERNAL_PASSWORD
             );

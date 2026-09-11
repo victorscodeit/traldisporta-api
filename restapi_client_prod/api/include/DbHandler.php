@@ -244,7 +244,7 @@ class DbHandler
     /**
      * Funció pública que ens guarda el log de la petició a la base de dades. Ens guarda qui ha fet la petició, quant i des de quina IP
      */
-    public function saveLog($token = false, $page, $data = false, $authCode = false)
+    public function saveLog($token = false, $page = null, $data = false, $authCode = false)
     {
         $userId = 'null';
         /*if ($token != false) {

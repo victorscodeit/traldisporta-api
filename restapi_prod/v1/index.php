@@ -8,7 +8,7 @@
  * @Developer:  Cristian Margall (support@openmindsystems.com.es)
  **/
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', getenv('PHP_DISPLAY_ERRORS') !== false ? getenv('PHP_DISPLAY_ERRORS') : '0');
 
 header("Access-Control-Allow-Origin: *");
 header('Access-Control-Allow-Credentials: true');

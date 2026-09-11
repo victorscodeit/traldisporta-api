@@ -41,9 +41,13 @@ function verifyRequiredParams($required_fields)
 
     $app = \Slim\Slim::getInstance();
     $request_params = json_decode($app->request()->getBody(), true);
+    if (!is_array($request_params)) {
+        $request_params = array();
+    }
 
     foreach ($required_fields as $field) {
-        if (!isset($request_params[$field]) || strlen(trim($request_params[$field])) <= 0) {
+        $value = isset($request_params[$field]) ? $request_params[$field] : null;
+        if (!is_scalar($value) || strlen(trim((string) $value)) <= 0) {
             $error = true;
             $error_fields .= $field . ', ';
         }
@@ -68,9 +72,12 @@ function validateToken()
 {
     $app = \Slim\Slim::getInstance();
     $params = json_decode($app->request->getBody(), true);
+    if (!is_array($params)) {
+        $params = array();
+    }
 
     //Comprovem que existi aixi parametre token
-    if (isset($params["token"]) || strlen(trim($params["token"])) >= 0) {
+    if (isset($params["token"]) && is_scalar($params["token"]) && strlen(trim((string) $params["token"])) >= 0) {
         $db = new DbHandler();
 
         //Comprovem a la base de dades aquest token
@@ -133,8 +140,8 @@ function logging($request, $token = false, $data = false, $authCode = false)
     $t = false;
     if ($token == false) {
         $params = json_decode($app->request->getBody(), true);
-        if (isset($params["token"])) {
-            if (strlen(trim($params["token"])) >= 0) {
+        if (is_array($params) && isset($params["token"]) && is_scalar($params["token"])) {
+            if (strlen(trim((string) $params["token"])) >= 0) {
                 $t = $params["token"];
             }
         }

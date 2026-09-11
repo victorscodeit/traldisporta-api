@@ -1,0 +1,19 @@
+{
+    "error": false,
+    "message": "Seccions carregades: 1",
+    "data": [
+        {
+            "id": "1",
+            "name": "Seccion test",
+            "level1": "N1",
+            "level2": "N2",
+            "level3": "N3",
+            "level4": "N4",
+            "level5": "N5",
+            "level6": "N6",
+            "level7": "N7",
+            "level8": "N8",
+            "level9": "N9"
+        }
+    ]
+}

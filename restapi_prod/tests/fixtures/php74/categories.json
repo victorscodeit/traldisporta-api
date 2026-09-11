@@ -1,0 +1,10 @@
+{
+    "error": false,
+    "message": "Categories carregades: 1",
+    "data": [
+        {
+            "id": "1",
+            "name": "Categoria test"
+        }
+    ]
+}
