@@ -28,7 +28,7 @@ $calls = array(
     ),
     'detail_invoice_100.json' => array(
         '/getDetailInvoice',
-        array('ImpFraNum' => 100, 'ImpFraCtr' => 8, 'ImpFraSer' => 1),
+        array('ImpFraNum' => 100, 'ImpFraCtr' => 8, 'ImpFraSer' => 108),
     ),
     'all_movements_2024_06.json' => array(
         '/getAllMovements',

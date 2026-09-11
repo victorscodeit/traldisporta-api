@@ -12,7 +12,7 @@
             "address": "Poligon 8",
             "zip": "08001",
             "city_id": "1",
-            "city_name": "Barcelona",
+            "city_name": "BARCELONA",
             "phone": "933000008",
             "fax": null,
             "email": "c8@traldis.test"
@@ -27,7 +27,7 @@
             "address": "Poligon 25",
             "zip": "08001",
             "city_id": "1",
-            "city_name": "Barcelona",
+            "city_name": "BARCELONA",
             "phone": "933000025",
             "fax": null,
             "email": "c25@traldis.test"
@@ -42,7 +42,7 @@
             "address": "Poligon 80",
             "zip": "08001",
             "city_id": "1",
-            "city_name": "Barcelona",
+            "city_name": "BARCELONA",
             "phone": "933000080",
             "fax": null,
             "email": "c80@traldis.test"

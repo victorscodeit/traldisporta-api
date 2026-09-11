@@ -85,7 +85,7 @@ class OdooApiContractTest extends TestCase
         $ids = array();
         foreach ($json['data'] as $row) {
             $ids[] = (int) $row['id'];
-            $this->assertSame('Barcelona', trim($row['city_name']));
+            $this->assertSame('BARCELONA', trim($row['city_name']));
         }
         $this->assertContains(8, $ids);
         $this->assertContains(25, $ids);
@@ -113,6 +113,25 @@ class OdooApiContractTest extends TestCase
         foreach ($json['data'] as $row) {
             $ids[] = (int) $row['id'];
             $this->assertNotSame('', trim($row['name']));
+            $this->assertArrayHasKey('iban_customer', $row);
+            $this->assertNotNull(
+                $row['iban_customer'],
+                'NULL IBAN becomes JSON null and Odoo does len(None)'
+            );
+            $this->assertIsString($row['iban_customer']);
+            $this->assertArrayHasKey('logistic_country_iso', $row);
+            $this->assertNotNull($row['logistic_country_iso']);
+            $this->assertIsString($row['logistic_country_iso']);
+            foreach (array(
+                'logistic_picking1',
+                'logistic_picking2',
+                'logistic_delivery1',
+                'logistic_delivery2',
+            ) as $field) {
+                $this->assertArrayHasKey($field, $row);
+                $this->assertNotNull($row[$field], $field);
+                $this->assertIsString($row[$field], $field);
+            }
         }
         $this->assertContains(1001, $ids);
         $this->assertNotContains(1002, $ids);
@@ -133,7 +152,14 @@ class OdooApiContractTest extends TestCase
         $this->assertArrayHasKey('amount', $row);
         $this->assertArrayHasKey('account', $row);
         $this->assertArrayHasKey('company', $row);
+        $this->assertArrayHasKey('last_two_digits', $row);
         $this->assertStringStartsWith('6', trim($row['account']));
+        $this->assertSame(10, strlen(trim($row['account'])));
+        $this->assertSame(
+            '10',
+            trim((string) $row['last_two_digits']),
+            '10-digit CtaCod like production (6280000010) so RIGHT(CtaCod,2) is Grupatge'
+        );
     }
 
     public function testSaleInvoicesJune2024()
@@ -159,7 +185,7 @@ class OdooApiContractTest extends TestCase
     {
         list($status, $json) = $this->post(
             '/getDetailInvoice',
-            array('ImpFraNum' => 100, 'ImpFraCtr' => 8, 'ImpFraSer' => 1),
+            array('ImpFraNum' => 100, 'ImpFraCtr' => 8, 'ImpFraSer' => 108),
             $this->key()
         );
         $this->assertSame(200, $status);
@@ -167,6 +193,11 @@ class OdooApiContractTest extends TestCase
         $this->assertNotEmpty($json);
         $this->assertArrayHasKey('ImpNeto', $json[0]);
         $this->assertArrayHasKey('TIva', $json[0]);
+        $this->assertSame(
+            '4',
+            trim((string) $json[0]['TIva']),
+            'TIva 4 maps to IVA 21% in oms.mtrans.invoice.tax.map'
+        );
     }
 
     public function testAllMovementsExcludesInvoiceAsientos()
@@ -203,5 +234,9 @@ class OdooApiContractTest extends TestCase
         $this->assertNotEmpty($json['data']);
         $this->assertArrayHasKey(40001, $json['data']);
         $this->assertArrayNotHasKey(40002, $json['data']);
+        foreach ($json['data'] as $key => $row) {
+            $this->assertIsArray($row, 'data[' . $key . '] must be an expedition dict, not an empty list');
+            $this->assertArrayHasKey('ExpCod', $row, 'data[' . $key . ']');
+        }
     }
 }
