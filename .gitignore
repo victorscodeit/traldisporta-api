@@ -1,2 +1,3 @@
 restapi_prod/v1/pdf/logs/
 restapi_prod/.phpunit.result.cache
+restapi_client_prod/api/tests/smoke/out/

@@ -1,0 +1,23 @@
+{
+  "count": 6252,
+  "error": null,
+  "json": true,
+  "keys": null,
+  "kind": "list",
+  "row_keys": [
+    "account",
+    "amount",
+    "ceco",
+    "company",
+    "date",
+    "id",
+    "last_two_digits",
+    "movement",
+    "movement_type",
+    "period",
+    "section",
+    "type",
+    "year"
+  ],
+  "status": 200
+}

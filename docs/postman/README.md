@@ -12,6 +12,8 @@
 - Usa `Traldisporta_Client_API.postman_collection.json` como coleccion base historica.
 - Usa `Traldisporta_API.postman_environment.json` como entorno sin secretos.
 
+Smoke repetible (forma JSON, no payloads): `restapi_client_prod/api/tests/smoke/README.md`.
+
 ## Importar en Postman
 
 1. Abre Postman.

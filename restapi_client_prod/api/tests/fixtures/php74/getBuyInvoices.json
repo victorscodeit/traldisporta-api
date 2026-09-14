@@ -1,0 +1,33 @@
+{
+  "count": 32,
+  "error": null,
+  "json": true,
+  "keys": null,
+  "kind": "list",
+  "row_keys": [
+    "CliCod",
+    "EmpCod",
+    "GrpAgeCod",
+    "ISP",
+    "IVAUE",
+    "IVAUECOD",
+    "PaiNem",
+    "RegAsiCod",
+    "RegCliDir",
+    "RegCliNif",
+    "RegCliNom",
+    "RegCliPob",
+    "RegCliPos",
+    "RegCtrCod",
+    "RegDatEmi",
+    "RegIva1I",
+    "RegIva2I",
+    "RegNum",
+    "RegRenNum",
+    "RegSer",
+    "RegTip",
+    "Total",
+    "bien_inversion"
+  ],
+  "status": 200
+}
