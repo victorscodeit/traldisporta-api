@@ -8,6 +8,7 @@
  * @Developer:  Cristian Margall (support@openmindsystems.com.es)
  **/
  require_once("db_connection.php");
+ require_once dirname(__DIR__) . '/../include/encoding.php';
 
 date_default_timezone_set("Europe/Madrid");
 
@@ -40,7 +41,7 @@ function utf8ize($d)
             $d[$k] = utf8ize($v);
         }
     } else if (is_string($d)) {
-        return utf8_encode($d);
+        return latin1_to_utf8($d);
     }
     return $d;
 }

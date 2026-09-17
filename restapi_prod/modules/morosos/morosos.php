@@ -13,6 +13,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
+require_once dirname(__DIR__) . '/../include/encoding.php';
+
 date_default_timezone_set("Europe/Madrid");
 
 class morosos
@@ -35,7 +37,7 @@ function utf8ize($d)
             $d[$k] = utf8ize($v);
         }
     } else if (is_string($d)) {
-        return utf8_encode($d);
+        return latin1_to_utf8($d);
     }
     return $d;
 }
@@ -265,10 +267,10 @@ WHERE v.RgVtoEst = 1
                 //"RgVtoEst" => $fila['RgVtoEst'],
                 "amountUnpaid" => $fila['RgVtoImp'],
                 "customerCode" => $fila['CliCod'],
-                "customerName" => utf8_encode($fila['RegCliNom']),
+                "customerName" => latin1_to_utf8($fila['RegCliNom']),
                 "customerNif" => $fila['RegCliNif'],
-                "userResp" => utf8_encode($fila['DepoComiDe']),
-                "userRespMail" => utf8_encode($fila['UseNet']),
+                "userResp" => latin1_to_utf8($fila['DepoComiDe']),
+                "userRespMail" => latin1_to_utf8($fila['UseNet']),
                 "invoiceNums" => $fila['RegNum'],
                 "unpaid" => $isUnpaid,
                 "lastPaymentDate" => $dPay,
@@ -656,8 +658,8 @@ function sendReportMorosospdf(){
 				$hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
 				if ($hasIncidence != false) {
 					$lastManagementDate = $this->formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
-					$manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
-					$lastComment = utf8_encode($hasIncidence['CinDes1'] ?? '');
+					$manager = latin1_to_utf8($hasIncidence['GinAsiUse'] ?? '');
+					$lastComment = latin1_to_utf8($hasIncidence['CinDes1'] ?? '');
 				}
 				$dateLastPayment="";	
 				if ($line["lastPaymentDate"] != '') {
@@ -808,8 +810,8 @@ function sendReportMorosospdf(){
 				$hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
 				if ($hasIncidence != false) {
 					$lastManagementDate = $this->formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
-					$manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
-					$lastComment = utf8_encode($hasIncidence['CinDes1'] ?? '');
+					$manager = latin1_to_utf8($hasIncidence['GinAsiUse'] ?? '');
+					$lastComment = latin1_to_utf8($hasIncidence['CinDes1'] ?? '');
 				}
 		
 				if ($line["lastPaymentDate"] != '') {
@@ -1019,8 +1021,8 @@ function sendReportMorosos(){
                 $hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
                 if ($hasIncidence != false) {
                     $lastManagementDate = $this->formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
-                    $manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
-                    $lastComment = $this->sanitizeComment(utf8_encode($hasIncidence['CinDes1'] ?? ''));
+                    $manager = latin1_to_utf8($hasIncidence['GinAsiUse'] ?? '');
+                    $lastComment = $this->sanitizeComment(latin1_to_utf8($hasIncidence['CinDes1'] ?? ''));
                 }
                 $dateLastPayment = '';
                 if (!empty($line["lastPaymentDate"])) {
@@ -1243,8 +1245,8 @@ foreach ($list as $codCompany => $company){
 					$hasIncidence = $this->hasIncidence($customerCod, $lastYear, $today);
 					if ($hasIncidence != false) {
 						$lastManagementDate = $this->formatMorosoGinRegDat($hasIncidence['GinRegDat'] ?? null);
-						$manager = utf8_encode($hasIncidence['GinAsiUse'] ?? '');
-						$lastComment = $this->sanitizeComment(utf8_encode($hasIncidence['CinDes1'] ?? ''));
+						$manager = latin1_to_utf8($hasIncidence['GinAsiUse'] ?? '');
+						$lastComment = $this->sanitizeComment(latin1_to_utf8($hasIncidence['CinDes1'] ?? ''));
 					}
 					$dateLastPayment="";	
 					if ($line["lastPaymentDate"] != '') {

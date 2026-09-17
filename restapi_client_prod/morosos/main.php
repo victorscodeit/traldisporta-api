@@ -738,7 +738,7 @@ if (isset($_REQUEST['fechaInit']) || isset($_REQUEST['fechaEnd']) || isset($_REQ
                                     if ($hasIncidence != false) {
                                         $hInc = true;
                                         $dGestio = $hasIncidence['GinRegDat']->format("d/m/Y");
-                                        $respGestio = utf8_encode($hasIncidence['GinAsiUse']);
+                                        $respGestio = latin1_to_utf8($hasIncidence['GinAsiUse']);
                                     }
 
                                     $day30 = '';

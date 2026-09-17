@@ -1,3 +1,22 @@
 restapi_prod/v1/pdf/logs/
-restapi_prod/.phpunit.result.cache
+.phpunit.result.cache
 restapi_client_prod/api/tests/smoke/out/
+
+# Python (smoke tests)
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local virtualenvs
+.venv/
+venv/
+env/
+
+# Editor / OS
+.DS_Store
+*~
+.idea/
+.vscode/

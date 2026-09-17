@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 //require_once("functions.php");
+require_once dirname(__DIR__) . '/../restapi_prod/include/encoding.php';
 require './lib/PHPMailer/src/PHPMailer.php';
 require './lib/PHPMailer/src/SMTP.php';
 require_once('./lib/TCPDF/tcpdf.php');
@@ -146,8 +147,8 @@ if (count($listBySalesmanEmpty) > 0) {
 					$lastManagementDate = $date->format("d/m/Y");
 				}
                 //$lastManagementDate = $hasIncidence['GinRegDat']->format("d/m/Y");
-                $manager = utf8_encode($hasIncidence['GinAsiUse']);
-                $lastComment = utf8_encode($hasIncidence['CinDes1']);
+                $manager = latin1_to_utf8($hasIncidence['GinAsiUse']);
+                $lastComment = latin1_to_utf8($hasIncidence['CinDes1']);
             }
 
             if ($line["lastPaymentDate"] != '') {
@@ -302,8 +303,8 @@ if (count($listBySalesman) > 0) {
 					$date = new DateTime($hasIncidence['GinRegDat']['date']);
 					$lastManagementDate = $date->format("d/m/Y");
 				}           
-                $manager = utf8_encode($hasIncidence['GinAsiUse']);
-                $lastComment = utf8_encode($hasIncidence['CinDes1']);
+                $manager = latin1_to_utf8($hasIncidence['GinAsiUse']);
+                $lastComment = latin1_to_utf8($hasIncidence['CinDes1']);
             }
     
             if ($line["lastPaymentDate"] != '') {

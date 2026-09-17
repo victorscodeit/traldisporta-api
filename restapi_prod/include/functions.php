@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__FILE__) . '/encoding.php';
+
 /**
  *
  * @About:      API Interface

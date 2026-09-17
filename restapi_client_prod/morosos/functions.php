@@ -1,6 +1,7 @@
 <?php
 
 require_once("db_connection.php");
+require_once dirname(__DIR__) . '/../restapi_prod/include/encoding.php';
 
 //I hem rebut una trucada a traves de javascript demanant informacio
 /*if (isset($_REQUEST['action'])) {
@@ -26,7 +27,7 @@ function utf8ize($d)
             $d[$k] = utf8ize($v);
         }
     } else if (is_string($d)) {
-        return utf8_encode($d);
+        return latin1_to_utf8($d);
     }
     return $d;
 }
@@ -202,10 +203,10 @@ function getFacturasPendientes($dateInit = false, $dateEnd = false, $salesman = 
                 //"RgVtoEst" => $fila['RgVtoEst'],
                 "amountUnpaid" => $fila['RgVtoImp'],
                 "customerCode" => $fila['CliCod'],
-                "customerName" => utf8_encode($fila['RegCliNom']),
+                "customerName" => latin1_to_utf8($fila['RegCliNom']),
                 "customerNif" => $fila['RegCliNif'],
-                "userResp" => utf8_encode($fila['DepoComiDe']),
-                "userRespMail" => utf8_encode($fila['UseNet']),
+                "userResp" => latin1_to_utf8($fila['DepoComiDe']),
+                "userRespMail" => latin1_to_utf8($fila['UseNet']),
                 "invoiceNums" => $fila['RegNum'],
                 "unpaid" => $isUnpaid,
                 "lastPaymentDate" => $dPay,
