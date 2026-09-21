@@ -2,6 +2,10 @@ restapi_prod/v1/pdf/logs/
 .phpunit.result.cache
 restapi_client_prod/api/tests/smoke/out/
 
+# Runtime artifacts (html2canvas / FPDF). Keep the directory via .gitkeep.
+restapi_client_prod/temperature_truck/tmp/*
+!restapi_client_prod/temperature_truck/tmp/.gitkeep
+
 # Python (smoke tests)
 __pycache__/
 *.py[cod]
