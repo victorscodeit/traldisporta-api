@@ -1,6 +1,13 @@
 <?php
+require_once dirname(__DIR__) . '/api/include/Config.php';
 require_once("functions.php");
 require_once("functionsLogin.php");
+$apiBase = api_upstream_url(array(
+    'API_PROTOCOL' => API_PROTOCOL,
+    'API_HOST' => API_HOST,
+    'API_PORT' => API_PORT,
+    'API_PATH' => API_PATH,
+));
 
 
 $facturas = [];
@@ -410,7 +417,7 @@ if (isset($_REQUEST['fechaInit']) || isset($_REQUEST['fechaEnd']) || isset($_REQ
         function getGestioData(incidenceCode, gestioNum) {
 			$.ajax({
 				type: "POST",
-				url: 'http://91.187.69.73:8080/restapi/v1/detail_incidence',
+				url: <?php echo json_encode($apiBase . '/detail_incidence'); ?>,
 				contentType: "application/json",
 				data: JSON.stringify({ incCode: incidenceCode, gestioNum: gestioNum }),
 				dataType: "json",
@@ -598,7 +605,7 @@ if (isset($_REQUEST['fechaInit']) || isset($_REQUEST['fechaEnd']) || isset($_REQ
         
 				$.ajax({
 					type: "POST",
-					url: 'http://91.187.69.73:8080/restapi/v1/all_gestions',
+					url: <?php echo json_encode($apiBase . '/all_gestions'); ?>,
 					contentType: "application/json",
 					data: JSON.stringify({ incCode: incidenceCode }),
 					dataType: "json",
@@ -919,7 +926,12 @@ if (isset($_REQUEST['fechaInit']) || isset($_REQUEST['fechaEnd']) || isset($_REQ
 </html>
 <?php
 function callApiHasIncidence($customerCode, $fechaInit, $fechaEnd) {
-    $url = 'http://91.187.69.73:8080/restapi_prod/v1/morosos/has_incidence'; // Usa la ruta real de tu API
+    $url = api_upstream_url(array(
+        'API_PROTOCOL' => API_PROTOCOL,
+        'API_HOST' => API_HOST,
+        'API_PORT' => API_PORT,
+        'API_PATH' => API_PATH,
+    )) . '/morosos/has_incidence';
 
     $payload = json_encode([
         "customerCode" => $customerCode,
@@ -938,7 +950,12 @@ function callApiHasIncidence($customerCode, $fechaInit, $fechaEnd) {
     return json_decode($response, true);
 }
 function callApiGetFacturas($fechaInit, $fechaEnd, $salesman) {
-    $url = 'http://91.187.69.73:8080/restapi_prod/v1/morosos/facturas_pendientes';
+    $url = api_upstream_url(array(
+        'API_PROTOCOL' => API_PROTOCOL,
+        'API_HOST' => API_HOST,
+        'API_PORT' => API_PORT,
+        'API_PATH' => API_PATH,
+    )) . '/morosos/facturas_pendientes';
     
     $payload = json_encode([
         "fechaInit" => $fechaInit,

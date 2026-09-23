@@ -8,25 +8,8 @@
  * @Developer:  Cristian Margall (support@openmindsystems.com.es)
  **/
 
-/**
- * Database configuration
- */
-define('DB_USERNAME', 'api_traldisporta');
-define('DB_PASSWORD', '684e4gfH?');
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'api');
+require_once dirname(__FILE__) . '/config_resolve.php';
 
-/**
- * External API configuration
- */
-define("API_PROTOCOL", 'http');
-define('API_HOST','91.187.69.73');
-define('API_PORT','8080');
-define('API_PATH','traldisporta-api/restapi_prod/v1');
-
-//API KEY per les peticions de funcionalitats només executables pel super admin
-define('API_KEY_ADMIN','d8746d4f4cf1b9a1634b19990d7ab6d1'); 
-
-
-
-?>
+$local = load_config_local(dirname(__FILE__) . '/config.local.php');
+$cfg = resolve_config(config_env_map(config_keys()), $local, 'client_ui');
+apply_resolved_config($cfg);

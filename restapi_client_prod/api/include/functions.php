@@ -356,15 +356,16 @@ function checkPassword($password, $hashPassword)
 
 function createURLAPI()
 {
-    $url = API_PROTOCOL . '://' . API_HOST;
-
-    if (API_PORT != '') {
-        $url .= ':' . API_PORT;
+    if (!function_exists('api_upstream_url')) {
+        require_once dirname(__FILE__) . '/config_resolve.php';
     }
 
-    $url .= '/' . API_PATH;
-
-    return $url;
+    return api_upstream_url(array(
+        'API_PROTOCOL' => API_PROTOCOL,
+        'API_HOST' => API_HOST,
+        'API_PORT' => API_PORT,
+        'API_PATH' => API_PATH,
+    ));
 }
 
 /**

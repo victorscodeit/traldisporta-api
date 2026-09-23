@@ -1,9 +1,15 @@
 <?php
+require_once dirname(__DIR__) . '/api/include/Config.php';
 
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'http://91.187.69.73:8080/restapi_prod/v1/generateExpeditionPdfs',
+  CURLOPT_URL => api_upstream_url(array(
+    'API_PROTOCOL' => API_PROTOCOL,
+    'API_HOST' => API_HOST,
+    'API_PORT' => API_PORT,
+    'API_PATH' => API_PATH,
+  )) . '/generateExpeditionPdfs',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10, 

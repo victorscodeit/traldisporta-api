@@ -1314,7 +1314,7 @@ $app->post('/refreshShowvehiclesCache', 'authenticate', function () use ($app) {
 $app->post('/morosos/send_report_morosos', 'authenticate', function () use ($app) {
     $authCode = getAuthorizationFromRequest();
     $payload = $app->request->getBody();
-    $targetUrl = 'http://91.187.69.73:8080/traldisporta-api/restapi_prod/v1/morosos/send_report_morosos';
+    $targetUrl = createURLAPI() . '/morosos/send_report_morosos';
 
     // Guardem registre al log
     $params = json_decode($payload, true);
@@ -1361,7 +1361,7 @@ $app->post('/morosos/send_report_morosos', 'authenticate', function () use ($app
 $app->post('/morosos/facturas_pendientes', 'authenticate', function () use ($app) {
     $authCode = getAuthorizationFromRequest();
     $payload = $app->request->getBody();
-    $targetUrl = 'http://91.187.69.73:8080/traldisporta-api/restapi_prod/v1/morosos/facturas_pendientes';
+    $targetUrl = createURLAPI() . '/morosos/facturas_pendientes';
 
     $params = json_decode($payload, true);
     logging('morosos_facturas_pendientes', false, $params, $authCode);

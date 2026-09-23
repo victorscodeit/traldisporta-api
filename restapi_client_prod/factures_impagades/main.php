@@ -35,7 +35,13 @@ if (
     || isset($_REQUEST['customerId']) || isset($_REQUEST['customerName']) || isset($_REQUEST['center']) || isset($_REQUEST['serie'])
     || isset($_REQUEST['documentType'])
 ) {
-    $url = "http://91.187.69.73:8080/restapi_prod/v1/unpaid_bills";
+    require_once dirname(__DIR__) . '/api/include/Config.php';
+    $url = api_upstream_url(array(
+        'API_PROTOCOL' => API_PROTOCOL,
+        'API_HOST' => API_HOST,
+        'API_PORT' => API_PORT,
+        'API_PATH' => API_PATH,
+    )) . '/unpaid_bills';
 
     $params = [
         "token" => "ABC123456", // Pon aquí el token si la API lo necesita

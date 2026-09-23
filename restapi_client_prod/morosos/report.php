@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 //require_once("functions.php");
+require_once dirname(__DIR__) . '/api/include/Config.php';
 require_once dirname(__DIR__) . '/../restapi_prod/include/encoding.php';
 require './lib/PHPMailer/src/PHPMailer.php';
 require './lib/PHPMailer/src/SMTP.php';
@@ -69,24 +70,7 @@ foreach ($list as $cliCod => $line) {
 //Comprovem la llista de clients que NO tenen un comercial assignat
 if (count($listBySalesmanEmpty) > 0) {
     //Preparem l'objecte que ens permetra enviar el mail
-    $mail = new PHPMailer();
-    $mail->CharSet = 'UTF-8';
-    $mail->IsSMTP();
-    $mail->Host = 'smtp.serviciodecorreo.es';
-    $mail->SMTPSecure = 'ssl';
-    $mail->Port = 465;
-    $mail->SMTPDebug = 2;
-    $mail->SMTPAuth = true;
-    $mail->Username = 'bot@porta.ad';
-    $mail->Password = 'Vityaro2';
-    $mail->SetFrom('bot@porta.ad');
-    $mail->SMTPOptions = array(
-        'ssl' => array(
-            'verify_peer' => false,
-            'verify_peer_name' => false,
-            'allow_self_signed' => true
-        )
-    );
+    $mail = create_smtp_mailer();
 
     $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
     $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
@@ -218,24 +202,7 @@ if (count($listBySalesmanEmpty) > 0) {
 if (count($listBySalesman) > 0) {
     foreach ($listBySalesman as $salesManName => $data) {
         //Preparem l'objecte que ens permetra enviar el mail
-        $mail = new PHPMailer();
-        $mail->CharSet = 'UTF-8';
-        $mail->IsSMTP();
-        $mail->Host = 'smtp.serviciodecorreo.es';
-        $mail->SMTPSecure = 'ssl';
-        $mail->Port = 465;
-        $mail->SMTPDebug  = 2;
-        $mail->SMTPAuth = true;
-        $mail->Username = 'bot@porta.ad';
-        $mail->Password = 'Vityaro2';
-        $mail->SetFrom('bot@porta.ad');
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true
-            )
-        );
+        $mail = create_smtp_mailer();
 
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
@@ -375,7 +342,12 @@ if (count($listBySalesman) > 0) {
 
 function callApiGetFacturas($fechaInit, $fechaEnd, $salesman) {
 	//echo "$fechaInit, $fechaEnd, $salesman";
-    $url = 'http://91.187.69.73:8080/restapi_prod/v1/morosos/facturas_pendientes';
+    $url = api_upstream_url(array(
+        'API_PROTOCOL' => API_PROTOCOL,
+        'API_HOST' => API_HOST,
+        'API_PORT' => API_PORT,
+        'API_PATH' => API_PATH,
+    )) . '/morosos/facturas_pendientes';
     
     $payload = json_encode([
         "fechaInit" => $fechaInit,
@@ -396,7 +368,12 @@ function callApiGetFacturas($fechaInit, $fechaEnd, $salesman) {
     return json_decode($response, true); // O false si falla
 }
 function callApiHasIncidence($customerCode, $fechaInit, $fechaEnd) {
-    $url = 'http://91.187.69.73:8080/restapi_prod/v1/morosos/has_incidence'; // Usa la ruta real de tu API
+    $url = api_upstream_url(array(
+        'API_PROTOCOL' => API_PROTOCOL,
+        'API_HOST' => API_HOST,
+        'API_PORT' => API_PORT,
+        'API_PATH' => API_PATH,
+    )) . '/morosos/has_incidence';
 
     $payload = json_encode([
         "customerCode" => $customerCode,
