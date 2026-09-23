@@ -584,24 +584,7 @@ function sendReportMorosospdf(){
 	if (count($listBySalesmanEmpty) > 0) {
 		
 		//Preparem l'objecte que ens permetra enviar el mail
-		$mail = new PHPMailer();
-		$mail->CharSet = 'UTF-8';
-		$mail->IsSMTP();
-		$mail->Host = 'smtp.serviciodecorreo.es';
-		$mail->SMTPSecure = 'ssl';
-		$mail->Port = 465;
-		$mail->SMTPDebug = 2;
-		$mail->SMTPAuth = true;
-		$mail->Username = 'bot@porta.ad';
-		$mail->Password = 'Vityaro2';
-		$mail->SetFrom('bot@porta.ad');
-		$mail->SMTPOptions = array(
-			'ssl' => array(
-				'verify_peer' => false,
-				'verify_peer_name' => false,
-				'allow_self_signed' => true
-			)
-		);
+		$mail = create_smtp_mailer();
 
 		$pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
 		$pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
@@ -729,24 +712,7 @@ function sendReportMorosospdf(){
 	if (count($listBySalesman) > 0) {
 		foreach ($listBySalesman as $salesManName => $data) {
 			//Preparem l'objecte que ens permetra enviar el mail
-			$mail = new PHPMailer();
-			$mail->CharSet = 'UTF-8';
-			$mail->IsSMTP();
-			$mail->Host = 'smtp.serviciodecorreo.es';
-			$mail->SMTPSecure = 'ssl';
-			$mail->Port = 465;
-			$mail->SMTPDebug  = 2;
-			$mail->SMTPAuth = true;
-			$mail->Username = 'bot@porta.ad';
-			$mail->Password = 'Vityaro2';
-			$mail->SetFrom('bot@porta.ad');
-			$mail->SMTPOptions = array(
-				'ssl' => array(
-					'verify_peer' => false,
-					'verify_peer_name' => false,
-					'allow_self_signed' => true
-				)
-			);
+			$mail = create_smtp_mailer();
 
 			$pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
 			$pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
@@ -930,24 +896,7 @@ function sendReportMorosos(){
     if (count($listBySalesmanEmpty) > 0) {
 
         // ---------- Mailer ----------
-        $mail = new PHPMailer();
-        $mail->CharSet = 'UTF-8';
-        $mail->IsSMTP();
-        $mail->Host = 'smtp.serviciodecorreo.es';
-        $mail->SMTPSecure = 'ssl';
-        $mail->Port = 465;
-        $mail->SMTPDebug = 2;
-        $mail->SMTPAuth = true;
-        $mail->Username = 'bot@porta.ad';
-        $mail->Password = 'Vityaro2';
-        $mail->SetFrom('bot@porta.ad');
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true
-            )
-        );
+        $mail = create_smtp_mailer();
 
         // Asegurar carpeta de salida
         $outDir = __DIR__ . '/pdf';
@@ -1195,24 +1144,7 @@ function sendReportMorosos_csv(){
 	if (count($listBySalesmanEmpty) > 0) {
 		
 		//Preparem l'objecte que ens permetra enviar el mail
-		$mail = new PHPMailer();
-		$mail->CharSet = 'UTF-8';
-		$mail->IsSMTP();
-		$mail->Host = 'smtp.serviciodecorreo.es';
-		$mail->SMTPSecure = 'ssl';
-		$mail->Port = 465;
-		$mail->SMTPDebug = 2;
-		$mail->SMTPAuth = true;
-		$mail->Username = 'bot@porta.ad';
-		$mail->Password = 'Vityaro2';
-		$mail->SetFrom('bot@porta.ad');
-		$mail->SMTPOptions = array(
-			'ssl' => array(
-				'verify_peer' => false,
-				'verify_peer_name' => false,
-				'allow_self_signed' => true
-			)
-		);
+		$mail = create_smtp_mailer();
 
 
 		

@@ -724,7 +724,7 @@ $app->post('/generateExpeditionPdfs', 'authenticate', function () use ($app) {
 			$expeditionCode=$exp['codigoExpedicion'];
 			$centerCode=$exp['codigoCentro'];
 			
-			$filePath = 'C:\wamp64\www\oms\restapi_prod\v1\pdf\\'.$centerCode.$expeditionCode.".pdf";
+			$filePath = pdf_storage_path($centerCode, $expeditionCode);
 			//echo $filePath;
 			// Comprobar si el archivo existe
 			if (file_exists($filePath)) {
@@ -785,7 +785,7 @@ $pdf->setPrintFooter(false);
 $pdf->writeHTML($html, true, false, true, false, '');
 
 // Guardar el PDF en una carpeta del servidor
-$directory = 'C:\wamp64\www\oms\restapi_prod\v1\pdf';
+$directory = pdf_storage_dir();
 //$directory = 'Z:\temperatura';
 $filename = $directory . '/'.$centerCode.''.$expeditionCode.'.pdf';
 $pdf->Output($filename, 'F');

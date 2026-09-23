@@ -1,3 +1,6 @@
+restapi_prod/include/config.local.php
+restapi_client_prod/api/include/config.local.php
+
 restapi_prod/v1/pdf/logs/
 .phpunit.result.cache
 restapi_client_prod/api/tests/smoke/out/

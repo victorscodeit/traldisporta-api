@@ -8,34 +8,8 @@
  * @Developer:  Cristian Margall (support@openmindsystems.com.es)
  **/
 
-/**
- * Database configuration
- *
- * DB_* puede sobreescribirse con variables de entorno (Docker local).
- */
-define('DB_USERNAME', getenv('DB_USERNAME') ?: 'root');
-define('DB_PASSWORD', getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : '');
-define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_NAME', getenv('DB_NAME') ?: 'restapi');
+require_once dirname(__FILE__) . '/config_resolve.php';
 
-/*define('DB_EXTERNAL_USERNAME', 'coffi.guy');
-define('DB_EXTERNAL_PASSWORD', 'Tyorpan4');
-define('DB_EXTERNAL_HOST', 'vhostsql2\TEST');
-define('DB_EXTERNAL_NAME', 'trans');*/
-
-define('DB_EXTERNAL_USERNAME', getenv('DB_EXTERNAL_USERNAME') ?: 'coffi.guy');
-define('DB_EXTERNAL_PASSWORD', getenv('DB_EXTERNAL_PASSWORD') !== false && getenv('DB_EXTERNAL_PASSWORD') !== ''
-    ? getenv('DB_EXTERNAL_PASSWORD')
-    : 'Tyorpan4');
-define('DB_EXTERNAL_HOST', getenv('DB_EXTERNAL_HOST') ?: 'vhostsql1');
-define('DB_EXTERNAL_NAME', getenv('DB_EXTERNAL_NAME') ?: 'trans');
-
-//API KEY per les peticions d'usuaris que utilitzin el webservice
-//define('API_KEY','3d524a53c110e4c22463b10ed32cef9d'); 
-
-//API KEY per les peticions de funcionalitats nomes executables pel super admin
-define('API_KEY_ADMIN','d8746d4f4cf1b9a1634b19990d7ab6d1'); 
-
-
-
-?>
+$local = load_config_local(dirname(__FILE__) . '/config.local.php');
+$cfg = resolve_config(config_env_map(config_keys()), $local, 'api');
+apply_resolved_config($cfg);

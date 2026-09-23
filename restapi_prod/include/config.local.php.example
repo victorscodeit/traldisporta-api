@@ -1,0 +1,24 @@
+<?php
+/**
+ * Copy to config.local.php on this server. Not used inside Docker (compose env wins).
+ * Do not commit config.local.php.
+ */
+return array(
+    'DB_HOST' => 'mysql',
+    'DB_NAME' => 'restapi',
+    'DB_USERNAME' => 'restapi',
+    'DB_PASSWORD' => 'restapi',
+    'DB_EXTERNAL_HOST' => 'mssql',
+    'DB_EXTERNAL_NAME' => 'trans',
+    'DB_EXTERNAL_USERNAME' => 'restapi',
+    'DB_EXTERNAL_PASSWORD' => 'Restapi_Sql1',
+    'SQLSRV_HOST' => 'mssql',
+    'SQLSRV_DATABASE' => 'trans',
+    'SQLSRV_USERNAME' => 'restapi',
+    'SQLSRV_PASSWORD' => 'Restapi_Sql1',
+    'MAIL_ENABLED' => '0',
+    'PDF_STORAGE_DIR' => '/var/www/html/restapi_prod/v1/pdf',
+    'API_HOST' => 'php',
+    'API_PORT' => '80',
+    'API_PATH' => 'restapi_prod/v1',
+);
