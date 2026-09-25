@@ -2,6 +2,8 @@
 /**
  * Copy to config.local.php on this server. Not used inside Docker (compose env wins).
  * Do not commit config.local.php.
+ *
+ * restapi_prod: MySQL auth, SQL Server, mail, PDF. Upstream URL is not used here.
  */
 return array(
     'DB_HOST' => 'mysql',
@@ -18,7 +20,4 @@ return array(
     'SQLSRV_PASSWORD' => 'Restapi_Sql1',
     'MAIL_ENABLED' => '0',
     'PDF_STORAGE_DIR' => '/var/www/html/restapi_prod/v1/pdf',
-    'API_HOST' => 'php',
-    'API_PORT' => '80',
-    'API_PATH' => 'restapi_prod/v1',
 );

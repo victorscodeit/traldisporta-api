@@ -18,6 +18,10 @@ class ConfigResolveTest extends TestCase
         $this->assertSame('restapi', $cfg['DB_NAME']);
         $this->assertNotSame('', $cfg['DB_EXTERNAL_PASSWORD']);
         $this->assertSame('smtp.serviciodecorreo.es', $cfg['MAIL_HOST']);
+        $this->assertArrayNotHasKey('API_HOST', $cfg);
+        $this->assertArrayNotHasKey('API_PORT', $cfg);
+        $this->assertArrayNotHasKey('API_PATH', $cfg);
+        $this->assertArrayNotHasKey('API_PROTOCOL', $cfg);
     }
 
     public function testClientUiProfileProductionDefaults()
@@ -68,7 +72,8 @@ class ConfigResolveTest extends TestCase
         $this->assertSame('mssql', $cfg['SQLSRV_HOST']);
         $this->assertFalse(mail_is_enabled($cfg));
         $this->assertNotSame('vhostsql1', $cfg['DB_EXTERNAL_HOST']);
-        $this->assertNotSame('91.187.69.73', isset($cfg['API_HOST']) ? $cfg['API_HOST'] : '');
+        $this->assertArrayNotHasKey('API_HOST', $example);
+        $this->assertArrayNotHasKey('API_HOST', $cfg);
     }
 
     public function testComposeEnvWinsOverExampleFile()
@@ -137,5 +142,7 @@ class ConfigResolveTest extends TestCase
         $this->assertArrayHasKey('SQLSRV_HOST', $summary);
         $this->assertArrayNotHasKey('SQLSRV_PASSWORD', $summary);
         $this->assertArrayNotHasKey('DB_PASSWORD', $summary);
+        $this->assertArrayNotHasKey('API_HOST', $summary);
+        $this->assertArrayNotHasKey('upstream', $summary);
     }
 }

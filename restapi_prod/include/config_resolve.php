@@ -52,10 +52,6 @@ if (!function_exists('config_defaults')) {
             'MAIL_HOST' => 'smtp.serviciodecorreo.es',
             'MAIL_USERNAME' => 'bot@porta.ad',
             'API_KEY_ADMIN' => 'd8746d4f4cf1b9a1634b19990d7ab6d1',
-            'API_PROTOCOL' => 'http',
-            'API_HOST' => '91.187.69.73',
-            'API_PORT' => '8080',
-            'API_PATH' => 'traldisporta-api/restapi_prod/v1',
         );
 
         if ($profile === 'client_ui') {
@@ -64,12 +60,11 @@ if (!function_exists('config_defaults')) {
                 'DB_PASSWORD' => '684e4gfH?',
                 'DB_HOST' => 'localhost',
                 'DB_NAME' => 'api',
-                'DB_EXTERNAL_USERNAME' => 'coffi.guy',
-                'DB_EXTERNAL_PASSWORD' => 'Tyorpan4',
-                'DB_EXTERNAL_HOST' => 'vhostsql1',
-                'DB_EXTERNAL_NAME' => 'trans',
                 'SQLSRV_HOST' => 'vhostsql2\\TEST',
-                'PDF_STORAGE_DIR' => '',
+                'API_PROTOCOL' => 'http',
+                'API_HOST' => '91.187.69.73',
+                'API_PORT' => '8080',
+                'API_PATH' => 'traldisporta-api/restapi_prod/v1',
             ));
         }
 
@@ -89,31 +84,9 @@ if (!function_exists('config_defaults')) {
 }
 
 if (!function_exists('config_keys')) {
-    function config_keys()
+    function config_keys($profile = 'api')
     {
-        return array(
-            'DB_USERNAME',
-            'DB_PASSWORD',
-            'DB_HOST',
-            'DB_NAME',
-            'DB_EXTERNAL_USERNAME',
-            'DB_EXTERNAL_PASSWORD',
-            'DB_EXTERNAL_HOST',
-            'DB_EXTERNAL_NAME',
-            'SQLSRV_HOST',
-            'SQLSRV_DATABASE',
-            'SQLSRV_USERNAME',
-            'SQLSRV_PASSWORD',
-            'PDF_STORAGE_DIR',
-            'MAIL_ENABLED',
-            'MAIL_HOST',
-            'MAIL_USERNAME',
-            'API_KEY_ADMIN',
-            'API_PROTOCOL',
-            'API_HOST',
-            'API_PORT',
-            'API_PATH',
-        );
+        return array_keys(config_defaults($profile));
     }
 }
 
@@ -268,17 +241,24 @@ if (!function_exists('pdf_storage_dir')) {
 if (!function_exists('public_config_summary')) {
     function public_config_summary($cfg)
     {
-        return array(
+        $summary = array(
             'DB_HOST' => $cfg['DB_HOST'],
             'DB_NAME' => $cfg['DB_NAME'],
-            'DB_EXTERNAL_HOST' => $cfg['DB_EXTERNAL_HOST'],
             'SQLSRV_HOST' => $cfg['SQLSRV_HOST'],
-            'API_HOST' => $cfg['API_HOST'],
-            'API_PORT' => $cfg['API_PORT'],
-            'API_PATH' => $cfg['API_PATH'],
             'MAIL_ENABLED' => $cfg['MAIL_ENABLED'],
-            'PDF_STORAGE_DIR' => $cfg['PDF_STORAGE_DIR'],
-            'upstream' => api_upstream_url($cfg),
         );
+        if (isset($cfg['DB_EXTERNAL_HOST'])) {
+            $summary['DB_EXTERNAL_HOST'] = $cfg['DB_EXTERNAL_HOST'];
+        }
+        if (isset($cfg['PDF_STORAGE_DIR'])) {
+            $summary['PDF_STORAGE_DIR'] = $cfg['PDF_STORAGE_DIR'];
+        }
+        if (isset($cfg['API_HOST'])) {
+            $summary['API_HOST'] = $cfg['API_HOST'];
+            $summary['API_PORT'] = $cfg['API_PORT'];
+            $summary['API_PATH'] = $cfg['API_PATH'];
+            $summary['upstream'] = api_upstream_url($cfg);
+        }
+        return $summary;
     }
 }
