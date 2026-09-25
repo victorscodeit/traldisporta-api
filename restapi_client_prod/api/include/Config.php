@@ -11,5 +11,5 @@
 require_once dirname(__FILE__) . '/config_resolve.php';
 
 $local = load_config_local(dirname(__FILE__) . '/config.local.php');
-$cfg = resolve_config(config_env_map(config_keys()), $local, 'client_ui');
+$cfg = resolve_config(config_env_map(config_keys('client_ui')), $local, 'client_ui');
 apply_resolved_config($cfg);

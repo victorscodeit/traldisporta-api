@@ -2,6 +2,8 @@
 /**
  * Copy to config.local.php on this server. Not used inside Docker (compose env wins).
  * Do not commit config.local.php.
+ *
+ * API_* is the restapi_prod upstream. MySQL is this proxy. SQLSRV is morosos/facturas UI.
  */
 return array(
     'DB_HOST' => 'mysql',
